@@ -1,0 +1,237 @@
+{
+  "server": {
+    "port": 5000,
+    "host": "0.0.0.0"
+  },
+  "theme": {
+    "background": "#0a0e17",
+    "background_gradient": "#111827",
+    "surface": "#1a2035",
+    "accent": "#1991ff",
+    "accent_hover": "#4db8ff",
+    "card_bg": "rgba(255,255,255,0.04)",
+    "card_hover": "rgba(255,255,255,0.08)",
+    "text": "#ffffff",
+    "text_secondary": "#8b9bb5",
+    "header_bg": "rgba(10,14,23,0.85)",
+    "success": "#22c55e",
+    "warning": "#f59e0b",
+    "error": "#ef4444",
+    "border": "rgba(255,255,255,0.06)"
+  },
+  "logo": {
+    "type": "both",
+    "text": "DeckLink",
+    "icon": "deck"
+  },
+  "categories": [
+    {
+      "id": "all",
+      "name": "Tout",
+      "icon": "apps"
+    },
+    {
+      "id": "multimedia",
+      "name": "Multimédia",
+      "icon": "music_note"
+    },
+    {
+      "id": "dev",
+      "name": "Développement",
+      "icon": "code"
+    },
+    {
+      "id": "system",
+      "name": "Système",
+      "icon": "settings"
+    },
+    {
+      "id": "games",
+      "name": "Jeux",
+      "icon": "sports_esports"
+    }
+  ],
+  "buttons": [
+    {
+      "id": "deezer",
+      "name": "Deezer",
+      "icon": "music_note",
+      "type": "app",
+      "path": "C:\\Program Files\\Deezer\\Deezer.exe",
+      "args": [],
+      "color": "#ff0050",
+      "category": "multimedia",
+      "favorite": true
+    },
+    {
+      "id": "spotify",
+      "name": "Spotify",
+      "icon": "audiotrack",
+      "type": "app",
+      "path": "spotify",
+      "args": [],
+      "color": "#1db954",
+      "category": "multimedia",
+      "favorite": true
+    },
+    {
+      "id": "youtube",
+      "name": "YouTube",
+      "icon": "play_circle",
+      "type": "url",
+      "path": "https://youtube.com",
+      "args": [],
+      "color": "#ff0000",
+      "category": "multimedia",
+      "favorite": false
+    },
+    {
+      "id": "chrome",
+      "name": "Chrome",
+      "icon": "language",
+      "type": "app",
+      "path": "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
+      "args": [],
+      "color": "#4285f4",
+      "category": "multimedia",
+      "favorite": true
+    },
+    {
+      "id": "vscode",
+      "name": "VS Code",
+      "icon": "terminal",
+      "type": "app",
+      "path": "code",
+      "args": [
+        "."
+      ],
+      "color": "#007acc",
+      "category": "dev",
+      "favorite": true
+    },
+    {
+      "id": "github",
+      "name": "GitHub",
+      "icon": "code",
+      "type": "url",
+      "path": "https://github.com",
+      "args": [],
+      "color": "#6e40c9",
+      "category": "dev",
+      "favorite": false
+    },
+    {
+      "id": "steam",
+      "name": "Steam",
+      "icon": "sports_esports",
+      "type": "app",
+      "path": "steam",
+      "args": [],
+      "color": "#1b2838",
+      "category": "games",
+      "favorite": true
+    },
+    {
+      "id": "discord",
+      "name": "Discord",
+      "icon": "forum",
+      "type": "app",
+      "path": "discord",
+      "args": [],
+      "color": "#5865f2",
+      "category": "games",
+      "favorite": true
+    },
+    {
+      "id": "explorer",
+      "name": "Explorateur",
+      "icon": "folder",
+      "type": "app",
+      "path": "explorer",
+      "args": [],
+      "color": "#ffb900",
+      "category": "system",
+      "favorite": false
+    },
+    {
+      "id": "cmd",
+      "name": "Terminal",
+      "icon": "terminal",
+      "type": "app",
+      "path": "cmd",
+      "args": [],
+      "color": "#4d4d4d",
+      "category": "system",
+      "favorite": false
+    },
+    {
+      "id": "notepad",
+      "name": "Bloc-notes",
+      "icon": "description",
+      "type": "app",
+      "path": "notepad",
+      "args": [],
+      "color": "#0078d4",
+      "category": "system",
+      "favorite": false
+    },
+    {
+      "id": "calculator",
+      "name": "Calculatrice",
+      "icon": "calculate",
+      "type": "app",
+      "path": "calc",
+      "args": [],
+      "color": "#1a9fff",
+      "category": "system",
+      "favorite": false
+    }
+  ],
+  "quick_actions": [
+    {
+      "id": "shutdown",
+      "name": "Éteindre",
+      "icon": "power_settings_new",
+      "type": "command",
+      "path": "shutdown /s /t 5",
+      "confirm": true,
+      "color": "#ef4444"
+    },
+    {
+      "id": "restart",
+      "name": "Redémarrer",
+      "icon": "restart_alt",
+      "type": "command",
+      "path": "shutdown /r /t 5",
+      "confirm": true,
+      "color": "#f59e0b"
+    },
+    {
+      "id": "lock",
+      "name": "Verrouiller",
+      "icon": "lock",
+      "type": "command",
+      "path": "rundll32.exe user32.dll,LockWorkStation",
+      "confirm": false,
+      "color": "#8b9bb5"
+    },
+    {
+      "id": "sleep",
+      "name": "Veille",
+      "icon": "nightlight",
+      "type": "command",
+      "path": "rundll32.exe powrprof.dll,SetSuspendState 0,1,0",
+      "confirm": false,
+      "color": "#6366f1"
+    },
+    {
+      "id": "screenshot",
+      "name": "Capture",
+      "icon": "screenshot",
+      "type": "screenshot",
+      "path": "",
+      "confirm": false,
+      "color": "#22c55e"
+    }
+  ]
+}

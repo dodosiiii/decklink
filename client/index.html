@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>DeckLink</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="app">
+  <header id="header">
+    <div class="header-left">
+      <button class="icon-btn" id="menuBtn" aria-label="Menu">
+        <span class="material-symbols-rounded">menu</span>
+      </button>
+      <div class="logo-area" id="logoArea">
+        <span class="material-symbols-rounded logo-icon" id="logoIcon">devices</span>
+        <span class="logo-text" id="logoText">DeckLink</span>
+      </div>
+    </div>
+    <div class="header-center">
+      <div class="search-box" id="searchBox">
+        <span class="material-symbols-rounded search-icon">search</span>
+        <input type="text" id="searchInput" placeholder="Rechercher..." autocomplete="off">
+      </div>
+    </div>
+    <div class="header-right">
+      <div id="connectionStatus" class="status-badge" title="Statut de connexion">
+        <span class="status-dot disconnected"></span>
+        <span class="status-text" id="statusText">Hors-ligne</span>
+      </div>
+      <button class="icon-btn" id="settingsBtn" aria-label="Paramètres">
+        <span class="material-symbols-rounded">tune</span>
+      </button>
+    </div>
+  </header>
+
+  <nav id="categoryNav">
+    <div class="category-list" id="categoryList"></div>
+  </nav>
+
+  <main id="mainContent">
+    <div class="section-header">
+      <h2 class="section-title" id="sectionTitle">Applications</h2>
+      <div class="section-actions">
+        <button class="icon-btn-sm" id="viewToggle" title="Vue compacte">
+          <span class="material-symbols-rounded">grid_view</span>
+        </button>
+      </div>
+    </div>
+    <div class="grid-container">
+      <div class="app-grid" id="appGrid"></div>
+      <div class="loading-skeleton" id="loadingSkeleton">
+        <div class="skeleton-card"><div class="skeleton-icon"></div><div class="skeleton-text"></div></div>
+        <div class="skeleton-card"><div class="skeleton-icon"></div><div class="skeleton-text"></div></div>
+        <div class="skeleton-card"><div class="skeleton-icon"></div><div class="skeleton-text"></div></div>
+        <div class="skeleton-card"><div class="skeleton-icon"></div><div class="skeleton-text"></div></div>
+        <div class="skeleton-card"><div class="skeleton-icon"></div><div class="skeleton-text"></div></div>
+        <div class="skeleton-card"><div class="skeleton-icon"></div><div class="skeleton-text"></div></div>
+        <div class="skeleton-card"><div class="skeleton-icon"></div><div class="skeleton-text"></div></div>
+        <div class="skeleton-card"><div class="skeleton-icon"></div><div class="skeleton-text"></div></div>
+      </div>
+    </div>
+    <div class="empty-state" id="emptyState">
+      <span class="material-symbols-rounded empty-icon">apps</span>
+      <h3>Aucune application</h3>
+      <p>Ajoutez des applications dans les paramètres</p>
+      <button class="btn-primary" onclick="openSettings()">Paramètres</button>
+    </div>
+  </main>
+
+  <footer id="bottomBar">
+    <div class="bottom-actions" id="bottomActions"></div>
+    <div class="bottom-extras" id="bottomExtras">
+      <button class="extra-btn" id="keyboardBtn" title="Clavier">
+        <span class="material-symbols-rounded">keyboard</span>
+      </button>
+      <button class="extra-btn" id="mediaBtn" title="Média">
+        <span class="material-symbols-rounded">music_note</span>
+      </button>
+      <button class="extra-btn" id="screenBtn" title="Écran">
+        <span class="material-symbols-rounded">screenshot_monitor</span>
+      </button>
+      <button class="extra-btn" id="filesBtn" title="Fichiers">
+        <span class="material-symbols-rounded">folder_open</span>
+      </button>
+      <button class="extra-btn" id="remoteBtn" title="Souris">
+        <span class="material-symbols-rounded">mouse</span>
+      </button>
+      <button class="extra-btn" id="toolsBtn" title="Outils">
+        <span class="material-symbols-rounded">build</span>
+      </button>
+      <button class="extra-btn" id="statsBtn" title="Système">
+        <span class="material-symbols-rounded">monitoring</span>
+      </button>
+    </div>
+  </footer>
+</div>
+
+<div id="screenPanel" class="slide-panel wide">
+  <div class="panel-header">
+    <h3>Écran du host</h3>
+    <div class="header-actions"><button class="icon-btn-sm" id="screenRefreshBtn" title="Actualiser"><span class="material-symbols-rounded">refresh</span></button><button class="icon-btn panel-close" id="screenClose"><span class="material-symbols-rounded">close</span></button></div>
+  </div>
+  <div class="panel-body" style="text-align:center">
+    <div id="screenContainer" style="position:relative;min-height:200px">
+      <img id="screenImage" style="max-width:100%;border-radius:var(--radius-sm);display:none;border:1px solid var(--card-border)">
+      <div id="screenLoading" style="padding:40px;color:var(--text-sec)">
+        <span class="material-symbols-rounded" style="font-size:40px;display:block;margin-bottom:8px">screenshot_monitor</span>
+        Cliquez sur Actualiser pour capturer l'écran
+      </div>
+    </div>
+    <div class="btn-row" style="justify-content:center;margin-top:8px">
+      <button class="btn-primary btn-sm" id="screenCaptureBtn"><span class="material-symbols-rounded">camera</span> Capturer</button>
+      <button class="btn-secondary btn-sm" id="screenLiveToggle"><span class="material-symbols-rounded">play_arrow</span> Live</button>
+    </div>
+  </div>
+</div>
+
+<div id="filePanel" class="slide-panel wide">
+  <div class="panel-header">
+    <h3>Explorateur de fichiers</h3>
+    <button class="icon-btn panel-close" id="fileClose"><span class="material-symbols-rounded">close</span></button>
+  </div>
+  <div class="panel-body">
+    <div class="file-nav" id="fileNav">
+      <button class="btn-secondary btn-sm" id="fileBackBtn"><span class="material-symbols-rounded">arrow_back</span> Retour</button>
+      <span class="file-path" id="filePath">C:\</span>
+    </div>
+    <div class="file-grid" id="fileGrid"></div>
+    <div class="file-info" id="fileInfo"></div>
+  </div>
+</div>
+
+<div id="remotePanel" class="slide-panel wide">
+  <div class="panel-header">
+    <h3>Souris distante</h3>
+    <button class="icon-btn panel-close" id="remoteClose"><span class="material-symbols-rounded">close</span></button>
+  </div>
+  <div class="panel-body">
+    <div class="mouse-status" id="mouseStatus">Position: 0, 0</div>
+    <div class="mouse-pad" id="mousePad">
+      <div class="mouse-pad-inner">
+        <span class="material-symbols-rounded">touchpad</span>
+        <p>Toucher/Cliquer pour déplacer la souris</p>
+      </div>
+    </div>
+    <div class="mouse-buttons">
+      <button class="mouse-btn" data-btn="left"><span class="material-symbols-rounded">touch_app</span> Clic gauche</button>
+      <button class="mouse-btn" data-btn="right"><span class="material-symbols-rounded">touch_app</span> Clic droit</button>
+      <button class="mouse-btn" data-btn="middle"><span class="material-symbols-rounded">touch_app</span> Clic milieu</button>
+      <button class="mouse-btn" data-btn="double"><span class="material-symbols-rounded">double_arrow</span> Double clic</button>
+    </div>
+    <div class="mouse-scroll">
+      <button class="scroll-btn" data-scroll="up"><span class="material-symbols-rounded">keyboard_arrow_up</span></button>
+      <button class="scroll-btn" data-scroll="down"><span class="material-symbols-rounded">keyboard_arrow_down</span></button>
+    </div>
+  </div>
+</div>
+
+<div id="toolsPanel" class="slide-panel wide">
+  <div class="panel-header">
+    <h3>Outils</h3>
+    <button class="icon-btn panel-close" id="toolsClose"><span class="material-symbols-rounded">close</span></button>
+  </div>
+  <div class="panel-body">
+    <div class="tools-tabs">
+      <button class="tab-btn active" data-ttab="clipboard"><span class="material-symbols-rounded">content_paste</span> Presse-papier</button>
+      <button class="tab-btn" data-ttab="powershell"><span class="material-symbols-rounded">terminal</span> PowerShell</button>
+      <button class="tab-btn" data-ttab="wol"><span class="material-symbols-rounded">wifi</span> Wake-on-LAN</button>
+      <button class="tab-btn" data-ttab="services"><span class="material-symbols-rounded">manage_accounts</span> Services</button>
+      <button class="tab-btn" data-ttab="wallpaper"><span class="material-symbols-rounded">wallpaper</span> Fond</button>
+      <button class="tab-btn" data-ttab="volume"><span class="material-symbols-rounded">volume_up</span> Volume</button>
+      <button class="tab-btn" data-ttab="system"><span class="material-symbols-rounded">settings_power</span> Système</button>
+    </div>
+    <div class="ttab-content active" id="ttab-clipboard">
+      <h4 style="margin-bottom:8px">Presse-papier</h4>
+      <textarea id="clipText" class="clip-textarea" placeholder="Texte du presse-papier..." rows="4"></textarea>
+      <div class="btn-row"><button class="btn-primary btn-sm" id="clipGetBtn"><span class="material-symbols-rounded">download</span> Lire</button><button class="btn-secondary btn-sm" id="clipSetBtn"><span class="material-symbols-rounded">upload</span> Envoyer</button></div>
+    </div>
+    <div class="ttab-content" id="ttab-powershell">
+      <h4 style="margin-bottom:8px">PowerShell distant</h4>
+      <textarea id="psScript" class="clip-textarea mono" placeholder="Write-Host 'Hello DeckLink'" rows="4"></textarea>
+      <button class="btn-primary btn-sm" id="psRunBtn"><span class="material-symbols-rounded">play_arrow</span> Exécuter</button>
+      <div class="ps-output" id="psOutput"></div>
+    </div>
+    <div class="ttab-content" id="ttab-wol">
+      <h4 style="margin-bottom:8px">Wake-on-LAN</h4>
+      <p style="font-size:12px;color:var(--text-sec);margin-bottom:8px">Adresse MAC (ex: AA:BB:CC:DD:EE:FF)</p>
+      <div style="display:flex;gap:6px"><input type="text" id="wolMac" class="form-input" placeholder="AA:BB:CC:DD:EE:FF"><button class="btn-primary btn-sm" id="wolBtn"><span class="material-symbols-rounded">power</span> Réveiller</button></div>
+    </div>
+    <div class="ttab-content" id="ttab-services">
+      <h4 style="margin-bottom:8px">Services Windows</h4>
+      <div class="services-list" id="servicesList"></div>
+    </div>
+    <div class="ttab-content" id="ttab-wallpaper">
+      <h4 style="margin-bottom:8px">Fond d'écran</h4>
+      <div class="wallpaper-preview" id="wallpaperPreview">
+        <span class="material-symbols-rounded" style="font-size:48px;opacity:0.3">wallpaper</span>
+      </div>
+      <div class="btn-row"><button class="btn-secondary btn-sm" id="wallpaperBrowseBtn"><span class="material-symbols-rounded">folder_open</span> Parcourir</button><button class="btn-secondary btn-sm" id="wallpaperCurrentBtn"><span class="material-symbols-rounded">image</span> Actuel</button></div>
+      <div class="wallpaper-grid" id="wallpaperGrid"></div>
+    </div>
+    <div class="ttab-content" id="ttab-volume">
+      <h4 style="margin-bottom:8px">Mixeur de volume</h4>
+      <div class="volume-list" id="volumeList"></div>
+    </div>
+    <div class="ttab-content" id="ttab-system">
+      <h4 style="margin-bottom:8px">Contrôles système</h4>
+      <div style="display:flex;flex-wrap:wrap;gap:6px">
+        <button class="btn-secondary btn-sm sys-cmd" data-cmd="lock"><span class="material-symbols-rounded">lock</span> Verrouiller</button>
+        <button class="btn-secondary btn-sm sys-cmd" data-cmd="sleep"><span class="material-symbols-rounded">nightlight</span> Veille</button>
+        <button class="btn-secondary btn-sm sys-cmd" data-cmd="shutdown"><span class="material-symbols-rounded">power_settings_new</span> Éteindre</button>
+        <button class="btn-secondary btn-sm sys-cmd" data-cmd="restart"><span class="material-symbols-rounded">restart_alt</span> Redémarrer</button>
+        <button class="btn-secondary btn-sm sys-cmd" data-cmd="empty_recycle"><span class="material-symbols-rounded">delete_sweep</span> Vider corbeille</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="keyboardPanel" class="slide-panel">
+  <div class="panel-header">
+    <h3>Clavier distant</h3>
+    <button class="icon-btn panel-close" id="keyboardClose"><span class="material-symbols-rounded">close</span></button>
+  </div>
+  <div class="panel-body">
+    <div class="keyboard-input-area">
+      <input type="text" id="kbInput" class="kb-text-input" placeholder="Tapez du texte..." autofocus>
+      <button class="btn-primary" id="kbSendBtn">Envoyer</button>
+    </div>
+    <div class="kb-shortcuts">
+      <button class="kb-key" data-key="enter">↵ Entrée</button>
+      <button class="kb-key" data-key="backspace">⌫ Retour</button>
+      <button class="kb-key" data-key="escape">⎋ Échap</button>
+      <button class="kb-key" data-key="tab">⇥ Tab</button>
+      <button class="kb-key" data-key="space">␣ Espace</button>
+      <button class="kb-key" data-key="delete">⌦ Suppr</button>
+    </div>
+    <div class="kb-shortcuts">
+      <button class="kb-key" data-key="mod+ctrl+c">Ctrl+C</button>
+      <button class="kb-key" data-key="mod+ctrl+v">Ctrl+V</button>
+      <button class="kb-key" data-key="mod+ctrl+x">Ctrl+X</button>
+      <button class="kb-key" data-key="mod+ctrl+z">Ctrl+Z</button>
+      <button class="kb-key" data-key="mod+ctrl+a">Ctrl+A</button>
+      <button class="kb-key" data-key="mod+ctrl+s">Ctrl+S</button>
+    </div>
+    <div class="kb-shortcuts">
+      <button class="kb-key" data-key="up">↑ Haut</button>
+      <button class="kb-key" data-key="down">↓ Bas</button>
+      <button class="kb-key" data-key="left">← Gauche</button>
+      <button class="kb-key" data-key="right">→ Droite</button>
+      <button class="kb-key" data-key="home">⇤ Début</button>
+      <button class="kb-key" data-key="end">⇥ Fin</button>
+    </div>
+  </div>
+</div>
+
+<div id="mediaPanel" class="slide-panel wide">
+  <div class="panel-header">
+    <h3>Contrôle média</h3>
+    <button class="icon-btn panel-close" id="mediaClose"><span class="material-symbols-rounded">close</span></button>
+  </div>
+  <div class="panel-body">
+    <div id="nowPlaying" class="now-playing">
+      <div class="np-placeholder" id="npPlaceholder">
+        <span class="material-symbols-rounded">music_note</span>
+        <p>Aucune lecture en cours</p>
+      </div>
+      <div class="np-content" id="npContent">
+        <div class="np-art" id="npArt">
+          <span class="material-symbols-rounded">audiotrack</span>
+        </div>
+        <div class="np-info">
+          <div class="np-title" id="npTitle">-</div>
+          <div class="np-artist" id="npArtist">-</div>
+          <div class="np-album" id="npAlbum">-</div>
+          <div class="np-source" id="npSource">-</div>
+        </div>
+        <div class="np-progress-area">
+          <div class="np-time">
+            <span id="npCurrentTime">0:00</span>
+            <span id="npTotalTime">0:00</span>
+          </div>
+          <div class="np-bar-track">
+            <div class="np-bar-fill" id="npBarFill"></div>
+            <div class="np-bar-thumb" id="npBarThumb"></div>
+          </div>
+        </div>
+        <div class="np-status" id="npStatus">-</div>
+      </div>
+    </div>
+    <div class="media-divider"></div>
+    <div class="media-section-label"><span class="material-symbols-rounded">queue_music</span> Deezer - Playlists</div>
+    <div id="deezerSection" class="deezer-section">
+      <div class="deezer-login-msg" id="deezerLoginMsg">
+        <p>Connectez-vous à Deezer pour voir vos playlists</p>
+        <button class="btn-primary btn-sm" id="deezerLoginBtn"><span class="material-symbols-rounded">login</span> Connexion Deezer</button>
+      </div>
+      <div class="deezer-playlists" id="deezerPlaylists"></div>
+      <div class="deezer-tracks" id="deezerTracks"></div>
+    </div>
+    <div class="media-divider"></div>
+    <div class="media-controls">
+      <button class="media-btn" data-cmd="prev"><span class="material-symbols-rounded">skip_previous</span><span>Précédent</span></button>
+      <button class="media-btn primary" data-cmd="play_pause"><span class="material-symbols-rounded">play_arrow</span><span>Play/Pause</span></button>
+      <button class="media-btn" data-cmd="next"><span class="material-symbols-rounded">skip_next</span><span>Suivant</span></button>
+      <button class="media-btn" data-cmd="stop"><span class="material-symbols-rounded">stop</span><span>Stop</span></button>
+    </div>
+    <div class="media-divider"></div>
+    <div class="media-controls">
+      <button class="media-btn" data-cmd="volume_down"><span class="material-symbols-rounded">volume_down</span><span>Volume -</span></button>
+      <button class="media-btn" data-cmd="mute"><span class="material-symbols-rounded">volume_off</span><span>Muet</span></button>
+      <button class="media-btn" data-cmd="volume_up"><span class="material-symbols-rounded">volume_up</span><span>Volume +</span></button>
+    </div>
+  </div>
+</div>
+
+<div id="statsPanel" class="slide-panel wide">
+  <div class="panel-header">
+    <h3>Monitoring système</h3>
+    <button class="icon-btn panel-close" id="statsClose"><span class="material-symbols-rounded">close</span></button>
+  </div>
+  <div class="panel-body">
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-label"><span class="material-symbols-rounded">memory</span> CPU</div>
+        <div class="stat-value" id="statCpu">0%</div>
+        <div class="stat-bar"><div class="stat-fill" id="statCpuBar"></div></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label"><span class="material-symbols-rounded">ram</span> RAM</div>
+        <div class="stat-value" id="statRam">0%</div>
+        <div class="stat-bar"><div class="stat-fill" id="statRamBar"></div></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label"><span class="material-symbols-rounded">hard_drive</span> Disque</div>
+        <div class="stat-value" id="statDisk">0%</div>
+        <div class="stat-bar"><div class="stat-fill" id="statDiskBar"></div></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label"><span class="material-symbols-rounded">devices</span> Hôte</div>
+        <div class="stat-value" id="statHostname">-</div>
+        <div class="stat-sub">IP: <span id="statIp">-</span></div>
+      </div>
+    </div>
+    <div class="stats-grid" style="margin-top:12px">
+      <div class="stat-card">
+        <div class="stat-label"><span class="material-symbols-rounded">schedule</span> Actif depuis</div>
+        <div class="stat-value" id="statUptime">-</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label"><span class="material-symbols-rounded">thermostat</span> Température</div>
+        <div class="stat-value" id="statTemp">-</div>
+      </div>
+      <div class="stat-card" id="gpuCard">
+        <div class="stat-label"><span class="material-symbols-rounded">videocard_chip</span> GPU</div>
+        <div class="stat-value" id="statGpuUtil">0%</div>
+        <div class="stat-bar"><div class="stat-fill" id="statGpuBar"></div></div>
+        <div class="stat-sub" id="statGpuInfo">-</div>
+      </div>
+      <div class="stat-card" id="gpuMemCard">
+        <div class="stat-label"><span class="material-symbols-rounded">videocard_chip</span> VRAM</div>
+        <div class="stat-value" id="statGpuMem">0%</div>
+        <div class="stat-bar"><div class="stat-fill" id="statGpuMemBar"></div></div>
+        <div class="stat-sub" id="statGpuTemp">Temp: -</div>
+      </div>
+    </div>
+    <div class="stats-section">
+      <h4>Processus actifs</h4>
+      <div class="process-list" id="processList"></div>
+    </div>
+  </div>
+</div>
+
+<div id="setupOverlay" class="overlay"></div>
+<div id="setupWizard" class="setup-wizard">
+  <div class="panel-header">
+    <h2 id="setupTitle">Bienvenue sur DeckLink</h2>
+  </div>
+  <div class="panel-body" id="setupBody">
+    <div id="setupStep1" class="setup-step active">
+      <div class="setup-welcome">
+        <span class="material-symbols-rounded" style="font-size:64px;color:var(--accent)">devices</span>
+        <h3>Configurez vos applications</h3>
+        <p>DeckLink peut détecter automatiquement les applications installées sur votre PC.</p>
+        <p style="color:var(--text-sec);font-size:13px">Les applications détectées seront ajoutées à votre grille. Vous pourrez les modifier à tout moment.</p>
+        <button class="btn-primary" id="setupScanBtn"><span class="material-symbols-rounded">scan</span> Détecter les applications</button>
+        <button class="btn-tertiary" id="setupSkipBtn">Passer</button>
+      </div>
+    </div>
+    <div id="setupStep2" class="setup-step">
+      <div class="setup-scanning" id="setupScanning">
+        <div class="setup-spinner"></div>
+        <p>Analyse du système...</p>
+      </div>
+      <div class="setup-results" id="setupResults" style="display:none">
+        <div class="setup-results-header">
+          <span id="setupResultCount">0</span> applications détectées
+          <div class="btn-row" style="margin-top:8px">
+            <button class="btn-secondary btn-sm" id="setupSelectAllBtn">Tout sélectionner</button>
+            <button class="btn-secondary btn-sm" id="setupDeselectAllBtn">Tout désélectionner</button>
+          </div>
+        </div>
+        <div class="setup-app-list" id="setupAppList"></div>
+        <div class="btn-row" style="margin-top:12px">
+          <button class="btn-primary" id="setupImportBtn"><span class="material-symbols-rounded">check</span> Ajouter sélection</button>
+          <button class="btn-tertiary" id="setupFinishBtn">Ignorer</button>
+        </div>
+      </div>
+    </div>
+    <div id="setupStep3" class="setup-step">
+      <div class="setup-done">
+        <span class="material-symbols-rounded" style="font-size:64px;color:var(--accent)">check_circle</span>
+        <h3>Configuration terminée !</h3>
+        <p id="setupDoneMsg">Vos applications ont été ajoutées.</p>
+        <button class="btn-primary" id="setupDoneBtn"><span class="material-symbols-rounded">arrow_forward</span> Commencer</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="settingsOverlay" class="overlay"></div>
+<div id="settingsPanel" class="settings-panel">
+  <div class="panel-header">
+    <h2>Paramètres</h2>
+    <div class="header-actions">
+      <button class="icon-btn" id="closeSettingsBtn"><span class="material-symbols-rounded">close</span></button>
+    </div>
+  </div>
+  <div class="panel-body">
+    <div class="settings-tabs">
+      <button class="tab-btn active" data-tab="apps"><span class="material-symbols-rounded">app_registration</span> Apps</button>
+      <button class="tab-btn" data-tab="theme"><span class="material-symbols-rounded">palette</span> Thème</button>
+      <button class="tab-btn" data-tab="brand"><span class="material-symbols-rounded">badge</span> Marque</button>
+      <button class="tab-btn" data-tab="actions"><span class="material-symbols-rounded">flash_on</span> Actions</button>
+      <button class="tab-btn" data-tab="categories"><span class="material-symbols-rounded">folder</span> Catégories</button>
+      <button class="tab-btn" data-tab="info"><span class="material-symbols-rounded">info</span> Infos</button>
+    </div>
+
+    <div class="tab-content active" id="tab-apps">
+      <div class="settings-section">
+        <div class="section-header-row">
+          <h3>Applications</h3>
+          <button class="btn-secondary btn-sm" id="detectAppBtn"><span class="material-symbols-rounded">scan</span> Auto</button>
+          <button class="btn-primary btn-sm" id="addAppBtn"><span class="material-symbols-rounded">add</span> Manuel</button>
+        </div>
+        <p class="section-desc">Gérez vos boutons d'applications</p>
+        <div id="appList" class="editor-list"></div>
+      </div>
+    </div>
+
+    <div class="tab-content" id="tab-theme">
+      <div class="settings-section">
+        <h3>Personnalisation</h3>
+        <p class="section-desc">Couleurs et apparence</p>
+        <div class="color-grid">
+          <div class="color-item">
+            <label>Fond 1</label><div class="color-row"><input type="color" id="bgColor1"><input type="text" id="bgColor1Text"></div>
+          </div>
+          <div class="color-item">
+            <label>Fond 2</label><div class="color-row"><input type="color" id="bgColor2"><input type="text" id="bgColor2Text"></div>
+          </div>
+          <div class="color-item">
+            <label>Surface</label><div class="color-row"><input type="color" id="surfaceColor"><input type="text" id="surfaceColorText"></div>
+          </div>
+          <div class="color-item">
+            <label>Accent</label><div class="color-row"><input type="color" id="accentColor"><input type="text" id="accentColorText"></div>
+          </div>
+          <div class="color-item">
+            <label>Carte</label><div class="color-row"><input type="color" id="cardColor"><input type="text" id="cardColorText"></div>
+          </div>
+          <div class="color-item">
+            <label>Texte</label><div class="color-row"><input type="color" id="textColor"><input type="text" id="textColorText"></div>
+          </div>
+          <div class="color-item">
+            <label>Texte 2</label><div class="color-row"><input type="color" id="textSecColor"><input type="text" id="textSecColorText"></div>
+          </div>
+        </div>
+        <div class="btn-row">
+          <button class="btn-primary btn-sm" id="applyThemeBtn">Appliquer</button>
+          <button class="btn-secondary btn-sm" id="resetThemeBtn">Défaut</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="tab-content" id="tab-brand">
+      <div class="settings-section">
+        <h3>Logo et nom</h3>
+        <div class="form-group">
+          <label>Type</label>
+          <select id="logoType">
+            <option value="both">Texte + Icône</option>
+            <option value="text">Texte seul</option>
+            <option value="icon">Icône seule</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Texte</label>
+          <input type="text" id="logoTextInput" class="form-input" placeholder="DeckLink">
+        </div>
+        <div class="form-group">
+          <label>Icône (nom Material icon)</label>
+          <input type="text" id="logoIconInput" class="form-input" placeholder="devices">
+          <span class="form-hint">ex: devices, computer, smart_display, dock, gaming_console</span>
+        </div>
+        <button class="btn-primary btn-sm" id="applyLogoBtn">Appliquer</button>
+      </div>
+    </div>
+
+    <div class="tab-content" id="tab-actions">
+      <div class="settings-section">
+        <div class="section-header-row">
+          <h3>Actions rapides</h3>
+          <button class="btn-primary btn-sm" id="addActionBtn"><span class="material-symbols-rounded">add</span> Ajouter</button>
+        </div>
+        <p class="section-desc">Barre d'actions en bas de l'écran</p>
+        <div id="actionList" class="editor-list"></div>
+      </div>
+    </div>
+
+    <div class="tab-content" id="tab-categories">
+      <div class="settings-section">
+        <div class="section-header-row">
+          <h3>Catégories</h3>
+          <button class="btn-primary btn-sm" id="addCategoryBtn"><span class="material-symbols-rounded">add</span> Ajouter</button>
+        </div>
+        <p class="section-desc">Organisez vos applications par catégories</p>
+        <div id="categoryListEdit" class="editor-list"></div>
+      </div>
+    </div>
+
+    <div class="tab-content" id="tab-info">
+      <div class="settings-section">
+        <h3>Informations</h3>
+        <div class="info-card">
+          <div class="info-row"><span>Hôte</span><span id="infoHostname">-</span></div>
+          <div class="info-row"><span>Adresse</span><span id="infoIp">-</span></div>
+          <div class="info-row"><span>Port</span><span id="infoPort">-</span></div>
+          <div class="info-row"><span>Plateforme</span><span id="infoPlatform">-</span></div>
+          <div class="info-row"><span>CPU</span><span id="infoCpu">-</span></div>
+          <div class="info-row"><span>RAM</span><span id="infoRam">-</span></div>
+        </div>
+        <p class="connection-hint">Connectez-vous sur : <strong id="connectionUrl">-</strong></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="modalOverlay" class="overlay"></div>
+<div id="modal" class="modal">
+  <div class="modal-header">
+    <h3 id="modalTitle">Confirmation</h3>
+    <button class="icon-btn" id="modalCloseBtn"><span class="material-symbols-rounded">close</span></button>
+  </div>
+  <div class="modal-body"><p id="modalMessage"></p></div>
+  <div class="modal-footer">
+    <button class="btn-secondary" id="modalCancelBtn">Annuler</button>
+    <button class="btn-danger" id="modalConfirmBtn">Confirmer</button>
+  </div>
+</div>
+
+<div id="editModal" class="modal edit-modal">
+  <div class="modal-header">
+    <h3 id="editModalTitle">Modifier</h3>
+    <button class="icon-btn" id="editModalClose"><span class="material-symbols-rounded">close</span></button>
+  </div>
+  <div class="modal-body" id="editModalBody"></div>
+  <div class="modal-footer">
+    <button class="btn-secondary" id="editModalCancel">Annuler</button>
+    <button class="btn-primary" id="editModalSave">Enregistrer</button>
+  </div>
+</div>
+
+<div id="toastContainer" class="toast-container"></div>
+
+<script src="https://cdn.socket.io/4.7.4/socket.io.min.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

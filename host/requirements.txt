@@ -1,0 +1,7 @@
+flask>=3.0
+flask-socketio>=5.3
+eventlet>=0.33
+psutil>=5.9
+nvidia-ml-py>=13
+wmi>=1.5
+pywin32>=300
