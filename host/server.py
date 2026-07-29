@@ -16,6 +16,7 @@ socketio = SocketIO(app, cors_allowed_origins="*")
 config = {}
 _cached_net_io = psutil.net_io_counters()
 _is_admin = False
+_cached_media = {"data":None,"time":0}
 
 try: _is_admin = ctypes.windll.shell32.IsUserAnAdmin() != 0
 except: pass
@@ -59,20 +60,27 @@ def run_ps_file(script_name, timeout=15):
     except Exception as e: return "", str(e), -1
 
 def launch_app(item):
-    path = item.get("path",""); args = item.get("args",[]); typ = item.get("type","app"); wd = item.get("working_dir")
+    path = item.get("path","").strip().strip('"').strip("'"); args = item.get("args",[]); typ = item.get("type","app"); wd = item.get("working_dir")
     try:
         if typ == "url": import webbrowser; webbrowser.open(path); return {"success":True,"message":"URL ouverte"}
         if typ == "command":
             subprocess.Popen(f'start "" "{path}"', shell=True, cwd=wd)
             return {"success":True,"message":"Commande exécutée"}
         if platform.system() == "Windows":
-            if not wd: wd = os.path.dirname(os.path.abspath(path)) if os.path.isfile(path) else None
+            resolved = path
+            # Add .exe if missing
+            if not os.path.isfile(resolved) and not resolved.lower().endswith(".exe"):
+                resolved += ".exe"
+            if not os.path.isfile(resolved):
+                # Try as is (might be a Windows command like "calc", "notepad")
+                pass
+            wd = wd or (os.path.dirname(os.path.abspath(resolved)) if os.path.isfile(resolved) else None)
             try:
-                subprocess.Popen([path]+args, cwd=wd)
-            except:
-                subprocess.Popen(f'start "" "{path}"', shell=True, cwd=wd)
+                subprocess.Popen([resolved] + args, cwd=wd)
+            except Exception as e1:
+                subprocess.Popen(f'start "" "{resolved}"', shell=True, cwd=wd)
         else:
-            subprocess.Popen([path]+args, cwd=wd)
+            subprocess.Popen([path] + args, cwd=wd)
         return {"success":True,"message":f"Lancé: {os.path.basename(path)}"}
     except Exception as e: return {"success":False,"message":str(e)}
 
@@ -145,9 +153,15 @@ def get_temperatures():
     return t
 
 def get_media_info():
-    """Get current media info: window titles then audio sessions"""
+    """Detect playing music from window titles or audio sessions"""
+    global _cached_media
+    now = time.time()
+    # Cache 2s to avoid flicker
+    if _cached_media["data"] and now - _cached_media["time"] < 2:
+        return _cached_media["data"]
+
     media_keywords = ["deezer","spotify","youtube","vlc","music","groove","foobar","winamp","wmp","netflix","prime video","audible","pandora","tidal","apple music"]
-    app_names = {"deezer":"Deezer","spotify":"Spotify","youtube":"YouTube","vlc":"VLC","foobar":"foobar2000","groove":"Groove","wmp":"WMP"}
+    app_names = {"deezer":"Deezer","spotify":"Spotify","youtube":"YouTube","vlc":"VLC","foobar":"foobar2000"}
 
     try:
         import win32gui
@@ -159,8 +173,8 @@ def get_media_info():
                     titles.append(t)
         win32gui.EnumWindows(enum_cb, None)
 
-        fg_hwnd = win32gui.GetForegroundWindow()
-        fg_title = win32gui.GetWindowText(fg_hwnd)
+        fg = win32gui.GetForegroundWindow()
+        fg_title = win32gui.GetWindowText(fg)
         if fg_title and len(fg_title) > 2 and fg_title not in ("Program Manager","Default IME",""):
             titles.insert(0, fg_title)
 
@@ -169,25 +183,37 @@ def get_media_info():
             kw = next((k for k in media_keywords if k in lower), None)
             app = app_names.get(kw, kw.title() if kw else None)
 
-            m1 = re.match(r'^(.+?)\s*[–\-|—]\s*(.+?)\s*[–\-|—]\s*(?:Deezer|Spotify|YouTube|VLC|Groove|Music|Pandora|Tidal).*$', title)
-            if m1:
-                return {"title":m1.group(1).strip(),"artist":m1.group(2).strip(),"album":"","app":app or title,"status":"Playing","pos":0,"dur":0,"source":"window"}
+            # "Song - Artist | Deezer/Spotify/YouTube/VLC"
+            m = re.match(r'^(.+?)\s*[–\-|—]\s*(.+?)\s*[–\-|—]\s*(?:Deezer|Spotify|YouTube|VLC|Groove|Music|Pandora|Tidal).*$', title)
+            if m:
+                _cached_media = {"data":{"title":m.group(1).strip(),"artist":m.group(2).strip(),"album":"","app":app or title,"status":"Playing","pos":0,"dur":0,"source":"window"},"time":now}
+                return _cached_media["data"]
 
-            m2 = re.match(r'^(.+?)\s*[–\-|—]\s*(.+)$', title)
-            if m2 and kw:
-                return {"title":m2.group(1).strip(),"artist":m2.group(2).strip(),"album":"","app":app,"status":"Playing","pos":0,"dur":0,"source":"window"}
+            # "Song - Artist" (ANY window with this pattern, even without keyword)
+            m = re.match(r'^(.+?)\s*[–\-|—]\s*(.+)$', title)
+            if m and (kw or len(title) < 60):
+                song, artist = m.group(1).strip(), m.group(2).strip()
+                if 2 < len(song) < 80 and 2 < len(artist) < 80:
+                    _cached_media = {"data":{"title":song,"artist":artist,"album":"","app":app or title,"status":"Playing","pos":0,"dur":0,"source":"window"},"time":now}
+                    return _cached_media["data"]
 
+            # App keyword in title
             if app and title != app:
-                return {"title":title,"artist":"","album":"","app":app,"status":"Playing","pos":0,"dur":0,"source":"window"}
+                _cached_media = {"data":{"title":title,"artist":"","album":"","app":app,"status":"Playing","pos":0,"dur":0,"source":"window"},"time":now}
+                return _cached_media["data"]
 
+        # Audio sessions
         try:
             from pycaw.pycaw import AudioUtilities
             for s in AudioUtilities.GetAllSessions():
                 if s.Process and s.Process.name() and s.State == 1:
                     name = s.Process.name().replace(".exe","").capitalize()
-                    return {"title":f"Lecture sur {name}","artist":"","album":"","app":name,"status":"Playing","pos":0,"dur":0,"source":"audio"}
+                    _cached_media = {"data":{"title":f"Lecture sur {name}","artist":"","album":"","app":name,"status":"Playing","pos":0,"dur":0,"source":"audio"},"time":now}
+                    return _cached_media["data"]
         except: pass
     except: pass
+
+    _cached_media = {"data":None,"time":now}
     return None
 
 KNOWN_APPS = {
