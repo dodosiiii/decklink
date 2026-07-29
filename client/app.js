@@ -11,7 +11,7 @@ function connectSocket() {
   updateStatus('connecting','Connexion...');
   socket = io(window.location.origin,{transports:['websocket','polling'],reconnection:true,reconnectionDelay:1000});
   socket.on('connect',()=>{connected=true;updateStatus('connected','Connecté');renderAll();startMediaPolling();});
-  socket.on('disconnect',()=>{connected=false;updateStatus('disconnected','Hors-ligne');});
+  socket.on('disconnect',()=>{connected=false;updateStatus('disconnected','Hors-ligne');stopMediaPolling();});
   socket.on('config',d=>{configData=d;renderAll();});
   socket.on('config_updated',()=>showToast('Configuration mise à jour','success'));
   socket.on('system_info',d=>{systemInfo=d;updateStats(d);updateInfoPanel(d);});
@@ -162,8 +162,8 @@ function updateInfoPanel(info){if(!info)return;$('infoHostname').textContent=inf
 function hideLoading(){document.querySelectorAll('.skeleton-card').forEach(s=>s.remove());}
 function openSettings(){$('settingsOverlay').classList.add('active');$('settingsPanel').classList.add('open');renderAll();if(systemInfo)updateInfoPanel(systemInfo);}
 function closeSettings(){$('settingsOverlay').classList.remove('active');$('settingsPanel').classList.remove('open');}
-function openPanel(id){document.querySelectorAll('.slide-panel').forEach(p=>p.classList.remove('open'));;$(id).classList.add('open');if(id==='mediaPanel'){socket.emit('get_media_info');if(mediaInterval)clearInterval(mediaInterval);mediaInterval=setInterval(()=>socket.emit('get_media_info'),2000);socket.emit('deezer_top');}else if(id!=='mediaPanel'){if(mediaInterval)clearInterval(mediaInterval);mediaInterval=setInterval(()=>socket.emit('get_media_info'),3000);}if(id==='statsPanel')socket.emit('get_system_info');if(id==='remotePanel')socket.emit('mouse_pos');if(id==='toolsPanel'){socket.emit('get_services');socket.emit('get_wallpaper');socket.emit('get_audio_devices');}}
-function closeAllPanels(){document.querySelectorAll('.slide-panel').forEach(p=>p.classList.remove('open'));if(screenInterval){clearInterval(screenInterval);screenInterval=null;$('screenLiveToggle').innerHTML='<span class="material-symbols-rounded">play_arrow</span> Live';}if($('mediaPanel').classList.contains('open')){$('mediaPanel').classList.remove('open');}}
+function openPanel(id){document.querySelectorAll('.slide-panel').forEach(p=>p.classList.remove('open'));$(id).classList.add('open');if(id==='mediaPanel'){socket.emit('get_media_info');if(mediaInterval)clearInterval(mediaInterval);mediaInterval=setInterval(()=>socket.emit('get_media_info'),2000);socket.emit('deezer_top');}if(id==='statsPanel')socket.emit('get_system_info');if(id==='remotePanel')socket.emit('mouse_pos');if(id==='toolsPanel'){socket.emit('get_services');socket.emit('get_wallpaper');socket.emit('get_audio_devices');}}
+function closeAllPanels(){document.querySelectorAll('.slide-panel').forEach(p=>p.classList.remove('open'));if(screenInterval){clearInterval(screenInterval);screenInterval=null;$('screenLiveToggle').innerHTML='<span class="material-symbols-rounded">play_arrow</span> Live';}}
 
 function startMediaPolling(){if(!mediaInterval){mediaInterval=setInterval(()=>socket.emit('get_media_info'),3000);socket.emit('get_media_info');}}
 function stopMediaPolling(){if(mediaInterval){clearInterval(mediaInterval);mediaInterval=null;}if(_mediaPosTimer){clearInterval(_mediaPosTimer);_mediaPosTimer=null;}}
