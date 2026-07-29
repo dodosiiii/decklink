@@ -93,6 +93,22 @@ main::-webkit-scrollbar-thumb:hover{background:rgba(255,255,255,0.15)}
 .empty-state p{font-size:14px;color:var(--text-sec);opacity:0.5}
 
 #bottomBar{flex-shrink:0;padding:8px 16px 12px;background:var(--header-bg);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border-top:1px solid var(--card-border);display:flex;align-items:center;justify-content:space-between;gap:8px}
+
+.mini-player{display:none;align-items:center;gap:10px;padding:6px 16px;background:var(--surface);border-top:1px solid var(--card-border);cursor:pointer;flex-shrink:0;transition:var(--transition);min-height:44px}
+.mini-player.active{display:flex}
+.mini-player:hover{background:var(--card)}
+.mini-player .mp-cover{width:32px;height:32px;border-radius:6px;background:linear-gradient(135deg,var(--accent),#7c3aed);display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden}
+.mini-player .mp-cover .material-symbols-rounded{font-size:18px;color:#fff}
+.mini-player .mp-cover img{width:100%;height:100%;object-fit:cover}
+.mini-player .mp-info{flex:1;min-width:0;overflow:hidden}
+.mini-player .mp-title{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mini-player .mp-artist{font-size:11px;color:var(--text-sec);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mini-player .mp-progress{width:60px;flex-shrink:0}
+.mini-player .mp-bar-track{height:3px;background:rgba(255,255,255,0.06);border-radius:2px;overflow:hidden}
+.mini-player .mp-bar-fill{height:100%;background:var(--accent);border-radius:2px;transition:width .3s ease}
+.mini-player .mp-play-btn{width:30px;height:30px;border:none;border-radius:50%;background:rgba(25,145,255,0.15);color:var(--accent);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:var(--transition)}
+.mini-player .mp-play-btn:hover{background:rgba(25,145,255,0.25);transform:scale(1.1)}
+.mini-player .mp-play-btn .material-symbols-rounded{font-size:18px}
 .bottom-actions{display:flex;gap:6px;flex-wrap:wrap;flex:1}
 .bottom-extras{display:flex;gap:4px;flex-shrink:0}
 .qa-btn{display:flex;align-items:center;gap:5px;padding:7px 12px;background:var(--card);border:1px solid var(--card-border);border-radius:var(--radius-sm);cursor:pointer;color:var(--text-sec);font-size:12px;font-weight:500;font-family:var(--font);transition:var(--transition)}

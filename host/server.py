@@ -17,6 +17,7 @@ config = {}
 _cached_net_io = psutil.net_io_counters()
 _is_admin = False
 _cached_media = {"data":None,"time":0}
+_media_rich_cache = {"data":None,"key":"","time":0}
 
 try: _is_admin = ctypes.windll.shell32.IsUserAnAdmin() != 0
 except: pass
@@ -152,11 +153,36 @@ def get_temperatures():
         except: pass
     return t
 
+def _deezer_enrich(title, artist):
+    """Look up song metadata from Deezer API (album, duration, cover)"""
+    global _media_rich_cache
+    key = f"{title}|{artist}"
+    now = time.time()
+    if _media_rich_cache["key"] == key and now - _media_rich_cache["time"] < 60:
+        return _media_rich_cache["data"]
+    try:
+        q = urllib.parse.quote(f'{artist} {title}')
+        req = urllib.request.Request(f'https://api.deezer.com/search?q={q}&limit=1',
+                                     headers={"User-Agent":"DeckLink/1.0"})
+        with urllib.request.urlopen(req, timeout=3) as r:
+            data = json.loads(r.read())
+            if data.get("data") and len(data["data"]) > 0:
+                t = data["data"][0]
+                rich = {
+                    "album": t.get("album",{}).get("title", ""),
+                    "duration": t.get("duration", 0),
+                    "cover": t.get("album",{}).get("cover_medium", "") or t.get("album",{}).get("cover", ""),
+                }
+                _media_rich_cache = {"data":rich,"key":key,"time":now}
+                return rich
+    except: pass
+    _media_rich_cache = {"data":{},"key":key,"time":now}
+    return {}
+
 def get_media_info():
     """Detect playing music from window titles or audio sessions"""
     global _cached_media
     now = time.time()
-    # Cache 2s to avoid flicker
     if _cached_media["data"] and now - _cached_media["time"] < 2:
         return _cached_media["data"]
 
@@ -182,34 +208,37 @@ def get_media_info():
             lower = title.lower()
             kw = next((k for k in media_keywords if k in lower), None)
             app = app_names.get(kw, kw.title() if kw else None)
+            song, artist = None, None
 
-            # "Song - Artist | Deezer/Spotify/YouTube/VLC"
             m = re.match(r'^(.+?)\s*[–\-|—]\s*(.+?)\s*[–\-|—]\s*(?:Deezer|Spotify|YouTube|VLC|Groove|Music|Pandora|Tidal).*$', title)
             if m:
-                _cached_media = {"data":{"title":m.group(1).strip(),"artist":m.group(2).strip(),"album":"","app":app or title,"status":"Playing","pos":0,"dur":0,"source":"window"},"time":now}
-                return _cached_media["data"]
-
-            # "Song - Artist" (ANY window with this pattern, even without keyword)
-            m = re.match(r'^(.+?)\s*[–\-|—]\s*(.+)$', title)
-            if m and (kw or len(title) < 60):
                 song, artist = m.group(1).strip(), m.group(2).strip()
-                if 2 < len(song) < 80 and 2 < len(artist) < 80:
-                    _cached_media = {"data":{"title":song,"artist":artist,"album":"","app":app or title,"status":"Playing","pos":0,"dur":0,"source":"window"},"time":now}
-                    return _cached_media["data"]
+            else:
+                m = re.match(r'^(.+?)\s*[–\-|—]\s*(.+)$', title)
+                if m and (kw or len(title) < 60):
+                    s, a = m.group(1).strip(), m.group(2).strip()
+                    if 2 < len(s) < 80 and 2 < len(a) < 80:
+                        song, artist = s, a
 
-            # App keyword in title
+            if song and artist:
+                rich = _deezer_enrich(song, artist)
+                info = {"title":song,"artist":artist,"album":rich.get("album",""),"app":app or title,"status":"Playing","pos":0,"dur":rich.get("duration",0),"cover":rich.get("cover",""),"source":"window"}
+                _cached_media = {"data":info,"time":now}
+                return info
+
             if app and title != app:
-                _cached_media = {"data":{"title":title,"artist":"","album":"","app":app,"status":"Playing","pos":0,"dur":0,"source":"window"},"time":now}
-                return _cached_media["data"]
+                info = {"title":title,"artist":"","album":"","app":app,"status":"Playing","pos":0,"dur":0,"cover":"","source":"window"}
+                _cached_media = {"data":info,"time":now}
+                return info
 
-        # Audio sessions
         try:
             from pycaw.pycaw import AudioUtilities
             for s in AudioUtilities.GetAllSessions():
                 if s.Process and s.Process.name() and s.State == 1:
                     name = s.Process.name().replace(".exe","").capitalize()
-                    _cached_media = {"data":{"title":f"Lecture sur {name}","artist":"","album":"","app":name,"status":"Playing","pos":0,"dur":0,"source":"audio"},"time":now}
-                    return _cached_media["data"]
+                    info = {"title":f"Lecture sur {name}","artist":"","album":"","app":name,"status":"Playing","pos":0,"dur":0,"cover":"","source":"audio"}
+                    _cached_media = {"data":info,"time":now}
+                    return info
         except: pass
     except: pass
 
@@ -363,7 +392,7 @@ def detect_installed_apps():
                         icon_b64 = None
                         if exe in known:
                             n, i, c, cat2 = known[exe]
-                            name, icon_name, color = n, i, c2
+                            name, icon_name, color = n, i, c
                             cat = cat2
                         if os.path.isfile(target):
                             icon_b64 = _get_icon(target)

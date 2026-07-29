@@ -9,7 +9,7 @@ function init() { connectSocket(); bindUI(); setInterval(()=>{if(connected)socke
 function connectSocket() {
   updateStatus('connecting','Connexion...');
   socket = io(window.location.origin,{transports:['websocket','polling'],reconnection:true,reconnectionDelay:1000});
-  socket.on('connect',()=>{connected=true;updateStatus('connected','Connecté');renderAll();});
+  socket.on('connect',()=>{connected=true;updateStatus('connected','Connecté');renderAll();startMediaPolling();});
   socket.on('disconnect',()=>{connected=false;updateStatus('disconnected','Hors-ligne');});
   socket.on('config',d=>{configData=d;renderAll();});
   socket.on('config_updated',()=>showToast('Configuration mise à jour','success'));
@@ -110,18 +110,29 @@ function _t(s){if(!s||s<=0)return'0:00';const m=Math.floor(s/60);return m+':'+St
 function _fs(s){if(!s)return'-';if(s<1024)return s+' o';if(s<1048576)return(s/1024).toFixed(1)+' Ko';return(s/1048576).toFixed(1)+' Mo';}
 
 function updateNowPlaying(d){
-  const ph=$('npPlaceholder'),ct=$('npContent');
-  if(!d||(!d.title&&!d.artist)){ph.style.display='flex';ct.classList.remove('active');if(mediaInterval){clearInterval(mediaInterval);mediaInterval=null;}return;}
-  ph.style.display='none';ct.classList.add('active');
+  const ph=$('npPlaceholder'),ct=$('npContent'),mp=$('miniPlayer');
+  if(!d||(!d.title&&!d.artist)){ph.style.display='flex';ct.classList.remove('active');mp.classList.remove('active');return;}
+  ph.style.display='none';ct.classList.add('active');mp.classList.add('active');
   $('npTitle').textContent=d.title||'-';$('npArtist').textContent=d.artist||'-';$('npAlbum').textContent=d.album||'';
+  $('mpTitle').textContent=d.title||'-';$('mpArtist').textContent=d.artist||'-';
   const appSrc=d.source==='window'?'Fenêtre ':(d.source==='audio'?'Audio ':'');
   $('npSource').textContent=d.app?appSrc+d.app:'';
   const pos=d.pos||0,dur=d.dur||0;
   $('npCurrentTime').textContent=_t(pos);$('npTotalTime').textContent=_t(dur);
   const pct=dur>0?Math.min(100,(pos/dur)*100):0;
   $('npBarFill').style.width=pct+'%';$('npBarThumb').style.left=pct+'%';
+  $('mpBarFill').style.width=pct+'%';
   const sm={'Playing':'▶ Lecture','Paused':'⏸ Pause','Stopped':'⏹ Arrêté'};
   $('npStatus').textContent=sm[d.status]||'Lecture en cours';
+  // Cover / album art
+  const art=$('npArt'),cover=$('mpCover');
+  if(d.cover){
+    art.innerHTML='<img src="'+d.cover+'" style="width:64px;height:64px;border-radius:8px;object-fit:cover">';
+    cover.innerHTML='<img src="'+d.cover+'" style="width:32px;height:32px;border-radius:6px;object-fit:cover">';
+  }else{
+    art.innerHTML='<span class="material-symbols-rounded">audiotrack</span>';
+    cover.innerHTML='<span class="material-symbols-rounded">music_note</span>';
+  }
 }
 
 function renderDeezerTop(d){const c=$('deezerPlaylists');if(!d||!d.tracks){c.innerHTML='<p style="padding:12px;color:var(--text-sec)">Chargement...</p>';return;}c.innerHTML=`<div class="dz-playlist active" style="background:rgba(25,145,255,0.08);border-color:rgba(25,145,255,0.2)"><div class="dz-icon"><span class="material-symbols-rounded" style="font-size:28px">trending_up</span></div><div class="dz-info"><div class="dz-name" style="font-size:15px">${escHtml(d.name)}</div><div class="dz-meta">${d.tracks.length} titres - Deezer Top</div></div></div><div class="deezer-tracks active" id="dzTrackList">${d.tracks.map(t=>`<div class="dz-track" data-id="${t.id}"><span class="dt-title">${escHtml(t.title)}</span><span class="dt-artist">${escHtml(t.artist)}</span><span class="dt-dur">${_t(t.duration)}</span></div>`).join('')}</div>`;c.querySelectorAll('.dz-track').forEach(el=>el.addEventListener('click',()=>{socket.emit('deezer_play',{track_id:el.dataset.id});showToast('Lecture Deezer','success');}));}
@@ -144,8 +155,11 @@ function updateInfoPanel(info){if(!info)return;$('infoHostname').textContent=inf
 function hideLoading(){document.querySelectorAll('.skeleton-card').forEach(s=>s.remove());}
 function openSettings(){$('settingsOverlay').classList.add('active');$('settingsPanel').classList.add('open');renderAll();if(systemInfo)updateInfoPanel(systemInfo);}
 function closeSettings(){$('settingsOverlay').classList.remove('active');$('settingsPanel').classList.remove('open');}
-function openPanel(id){document.querySelectorAll('.slide-panel').forEach(p=>p.classList.remove('open'));;$(id).classList.add('open');if(id==='mediaPanel'){socket.emit('get_media_info');if(mediaInterval)clearInterval(mediaInterval);mediaInterval=setInterval(()=>socket.emit('get_media_info'),2000);socket.emit('deezer_top');}if(id==='statsPanel')socket.emit('get_system_info');if(id==='remotePanel')socket.emit('mouse_pos');if(id==='toolsPanel'){socket.emit('get_services');socket.emit('get_wallpaper');socket.emit('get_audio_devices');}}
-function closeAllPanels(){document.querySelectorAll('.slide-panel').forEach(p=>p.classList.remove('open'));if(mediaInterval){clearInterval(mediaInterval);mediaInterval=null;}if(screenInterval){clearInterval(screenInterval);screenInterval=null;$('screenLiveToggle').innerHTML='<span class="material-symbols-rounded">play_arrow</span> Live';}}
+function openPanel(id){document.querySelectorAll('.slide-panel').forEach(p=>p.classList.remove('open'));;$(id).classList.add('open');if(id==='mediaPanel'){socket.emit('get_media_info');if(mediaInterval)clearInterval(mediaInterval);mediaInterval=setInterval(()=>socket.emit('get_media_info'),2000);socket.emit('deezer_top');}else if(id!=='mediaPanel'){if(mediaInterval)clearInterval(mediaInterval);mediaInterval=setInterval(()=>socket.emit('get_media_info'),3000);}if(id==='statsPanel')socket.emit('get_system_info');if(id==='remotePanel')socket.emit('mouse_pos');if(id==='toolsPanel'){socket.emit('get_services');socket.emit('get_wallpaper');socket.emit('get_audio_devices');}}
+function closeAllPanels(){document.querySelectorAll('.slide-panel').forEach(p=>p.classList.remove('open'));if(screenInterval){clearInterval(screenInterval);screenInterval=null;$('screenLiveToggle').innerHTML='<span class="material-symbols-rounded">play_arrow</span> Live';}if($('mediaPanel').classList.contains('open')){$('mediaPanel').classList.remove('open');}}
+
+function startMediaPolling(){if(!mediaInterval){mediaInterval=setInterval(()=>socket.emit('get_media_info'),3000);socket.emit('get_media_info');}}
+function stopMediaPolling(){if(mediaInterval){clearInterval(mediaInterval);mediaInterval=null;}}
 
 function renderFileList(items){const grid=$('fileGrid');if(!items||items.length===0){grid.innerHTML='<p style="color:var(--text-sec);padding:20px">Dossier vide</p>';return;}grid.innerHTML=items.map(i=>`<div class="file-item" data-path="${escHtml(i.path)}" data-dir="${i.is_dir}"><span class="fi-icon ${i.is_dir?'dir':''} material-symbols-rounded">${i.is_dir?'folder':i.name.endsWith('.exe')?'terminal':i.name.endsWith('.jpg')||i.name.endsWith('.png')?'image':i.name.endsWith('.mp3')?'music_note':i.name.endsWith('.mp4')?'movie':i.name.endsWith('.pdf')?'picture_as_pdf':i.name.endsWith('.zip')?'folder_zip':'description'}</span><div class="fi-info"><div class="fi-name">${escHtml(i.name)}</div><div class="fi-size">${i.is_dir?'Dossier':_fs(i.size)}</div></div></div>`).join('');grid.querySelectorAll('.file-item').forEach(el=>{el.addEventListener('click',()=>{if(el.dataset.dir==='True'){fileHistory.push($('filePath').textContent);$('filePath').textContent=el.dataset.path;socket.emit('file_list',{path:el.dataset.path});}else{socket.emit('file_download',{path:el.dataset.path});showToast('Téléchargement...','info');}});});$('fileBackBtn').style.display=fileHistory.length?'inline-flex':'none';}
 function handleFileDownload(d){if(d.error){showToast('Erreur: '+d.error,'error');return;}try{const b64=d.data;const byteChars=atob(b64);const byteNums=new Array(byteChars.length);for(let i=0;i<byteChars.length;i++)byteNums[i]=byteChars.charCodeAt(i);const byteArr=new Uint8Array(byteNums);const blob=new Blob([byteArr]);const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=d.name||'fichier';document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);showToast('Téléchargé: '+d.name,'success');}catch(e){showToast('Erreur téléchargement','error');}}
@@ -194,6 +208,8 @@ document.querySelectorAll('.kb-key').forEach(b=>b.addEventListener('click',()=>s
 
 // Media
 $('mediaBtn').addEventListener('click',()=>openPanel('mediaPanel'));$('mediaClose').addEventListener('click',closeAllPanels);
+$('miniPlayer').addEventListener('click',()=>openPanel('mediaPanel'));
+$('mpPlayBtn').addEventListener('click',(e)=>{e.stopPropagation();socket.emit('media_command',{command:'play_pause'});});
 document.querySelectorAll('.media-btn').forEach(b=>b.addEventListener('click',()=>socket.emit('media_command',{command:b.dataset.cmd})));
 
 // Screen
