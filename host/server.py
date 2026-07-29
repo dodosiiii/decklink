@@ -16,7 +16,7 @@ socketio = SocketIO(app, cors_allowed_origins="*")
 config = {}
 _cached_net_io = psutil.net_io_counters()
 _is_admin = False
-_cached_media = {"data":None,"time":0}
+_cached_media = {"data":None,"time":0,"pos_start":0,"last_key":""}
 _media_rich_cache = {"data":None,"key":"","time":0}
 
 try: _is_admin = ctypes.windll.shell32.IsUserAnAdmin() != 0
@@ -222,13 +222,22 @@ def get_media_info():
 
             if song and artist:
                 rich = _deezer_enrich(song, artist)
-                info = {"title":song,"artist":artist,"album":rich.get("album",""),"app":app or title,"status":"Playing","pos":0,"dur":rich.get("duration",0),"cover":rich.get("cover",""),"source":"window"}
-                _cached_media = {"data":info,"time":now}
+                key = f"{song}|{artist}"
+                pos = 0
+                if _cached_media["last_key"] == key and _cached_media["pos_start"] > 0:
+                    pos = min(time.time() - _cached_media["pos_start"], rich.get("duration",0) or 99999)
+                else:
+                    _cached_media["pos_start"] = time.time()
+                _cached_media["last_key"] = key
+                info = {"title":song,"artist":artist,"album":rich.get("album",""),"app":app or title,"status":"Playing","pos":pos,"dur":rich.get("duration",0),"cover":rich.get("cover",""),"source":"window"}
+                _cached_media["data"] = info
+                _cached_media["time"] = now
                 return info
 
             if app and title != app:
                 info = {"title":title,"artist":"","album":"","app":app,"status":"Playing","pos":0,"dur":0,"cover":"","source":"window"}
-                _cached_media = {"data":info,"time":now}
+                _cached_media["data"] = info
+                _cached_media["time"] = now
                 return info
 
         try:
@@ -237,12 +246,14 @@ def get_media_info():
                 if s.Process and s.Process.name() and s.State == 1:
                     name = s.Process.name().replace(".exe","").capitalize()
                     info = {"title":f"Lecture sur {name}","artist":"","album":"","app":name,"status":"Playing","pos":0,"dur":0,"cover":"","source":"audio"}
-                    _cached_media = {"data":info,"time":now}
+                    _cached_media["data"] = info
+                    _cached_media["time"] = now
                     return info
         except: pass
     except: pass
 
-    _cached_media = {"data":None,"time":now}
+    _cached_media["data"] = None
+    _cached_media["time"] = now
     return None
 
 KNOWN_APPS = {
@@ -689,10 +700,32 @@ def handle_key_press(data):
 @socketio.on("media_command")
 def handle_media_command(data):
     cmd = data.get("command","")
-    ks = {"play_pause":0xB3,"next":0xB0,"prev":0xB1,"stop":0xB2,"volume_up":0xAF,"volume_down":0xAE,"mute":0xAD}
+    ks = {"play_pause":(0xB3,14),"next":(0xB0,11),"prev":(0xB1,12),"stop":(0xB2,13),"volume_up":(0xAF,None),"volume_down":(0xAE,None),"mute":(0xAD,None)}
     try:
-        v=ks.get(cmd)
-        if v: ctypes.windll.user32.keybd_event(v,0,0,0); ctypes.windll.user32.keybd_event(v,0,2,0)
+        pair = ks.get(cmd)
+        if not pair: return emit("media_result",{"success":False,"message":"Commande inconnue"})
+        vk, appcmd = pair
+        # 1) SendInput with media key (most reliable)
+        try:
+            from ctypes import wintypes
+            class _KBDI(ctypes.Structure):
+                _fields_ = [("wVk", wintypes.WORD),("wScan", wintypes.WORD),("dwFlags", ctypes.c_ulong),("time", ctypes.c_ulong),("dwExtraInfo", ctypes.c_ulong)]
+            class _INPUT(ctypes.Structure):
+                _fields_ = [("type", ctypes.c_ulong), ("u", _KBDI)]
+            for flags in [0, 2]:
+                inp = _INPUT(); inp.type = 1; inp.u.wVk = vk; inp.u.wScan = 0; inp.u.dwFlags = flags; inp.u.time = 0; inp.u.dwExtraInfo = 0
+                ctypes.windll.user32.SendInput(1, ctypes.byref(inp), ctypes.sizeof(inp))
+        except: pass
+        # 2) Fallback to keybd_event
+        try:
+            ctypes.windll.user32.keybd_event(vk,0,0,0); time.sleep(0.03); ctypes.windll.user32.keybd_event(vk,0,2,0)
+        except: pass
+        # 3) WM_APPCOMMAND via SendMessage to foreground window
+        if appcmd:
+            try:
+                hwnd = ctypes.windll.user32.GetForegroundWindow()
+                ctypes.windll.user32.SendMessageW(hwnd, 0x0319, 0, 0xE000 | appcmd)
+            except: pass
         emit("media_result",{"success":True})
     except Exception as e: emit("media_result",{"success":False,"message":str(e)})
 

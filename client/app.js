@@ -2,6 +2,7 @@ let socket, configData, systemInfo, connected = false;
 let activeCategory = 'all', searchQuery = '', fileHistory = [];
 let mediaInterval = null, screenInterval = null, mouseTracking = false;
 let detectedApps = [], setupSelectedApps = new Set(), _detectModalOpen = false;
+let _mediaPosTimer = null, _mediaPos = 0, _mediaDur = 0;
 const $ = id => document.getElementById(id);
 
 function init() { connectSocket(); bindUI(); setInterval(()=>{if(connected)socket.emit('get_system_info');},5000); }
@@ -109,22 +110,28 @@ function applyLogo(l){if(!l)return;const icon=$('logoIcon'),text=$('logoText');i
 function _t(s){if(!s||s<=0)return'0:00';const m=Math.floor(s/60);return m+':'+String(Math.floor(s%60)).padStart(2,'0');}
 function _fs(s){if(!s)return'-';if(s<1024)return s+' o';if(s<1048576)return(s/1024).toFixed(1)+' Ko';return(s/1048576).toFixed(1)+' Mo';}
 
+function _updateProgressBars(){
+  if(!_mediaDur)return;
+  if(_mediaPos < _mediaDur) _mediaPos = Math.min(_mediaPos + 1, _mediaDur);
+  const pct = _mediaDur > 0 ? Math.min(100, (_mediaPos / _mediaDur) * 100) : 0;
+  $('npCurrentTime').textContent=_t(_mediaPos);
+  $('npBarFill').style.width=pct+'%';$('npBarThumb').style.left=pct+'%';
+  $('mpBarFill').style.width=pct+'%';
+}
 function updateNowPlaying(d){
   const ph=$('npPlaceholder'),ct=$('npContent'),mp=$('miniPlayer');
-  if(!d||(!d.title&&!d.artist)){ph.style.display='flex';ct.classList.remove('active');mp.classList.remove('active');return;}
+  if(!d||(!d.title&&!d.artist)){ph.style.display='flex';ct.classList.remove('active');mp.classList.remove('active');if(_mediaPosTimer){clearInterval(_mediaPosTimer);_mediaPosTimer=null;}return;}
   ph.style.display='none';ct.classList.add('active');mp.classList.add('active');
   $('npTitle').textContent=d.title||'-';$('npArtist').textContent=d.artist||'-';$('npAlbum').textContent=d.album||'';
   $('mpTitle').textContent=d.title||'-';$('mpArtist').textContent=d.artist||'-';
   const appSrc=d.source==='window'?'Fenêtre ':(d.source==='audio'?'Audio ':'');
   $('npSource').textContent=d.app?appSrc+d.app:'';
-  const pos=d.pos||0,dur=d.dur||0;
-  $('npCurrentTime').textContent=_t(pos);$('npTotalTime').textContent=_t(dur);
-  const pct=dur>0?Math.min(100,(pos/dur)*100):0;
-  $('npBarFill').style.width=pct+'%';$('npBarThumb').style.left=pct+'%';
-  $('mpBarFill').style.width=pct+'%';
+  _mediaPos = d.pos||0; _mediaDur = d.dur||0;
+  $('npTotalTime').textContent=_t(_mediaDur);
   const sm={'Playing':'▶ Lecture','Paused':'⏸ Pause','Stopped':'⏹ Arrêté'};
   $('npStatus').textContent=sm[d.status]||'Lecture en cours';
-  // Cover / album art
+  if(!_mediaPosTimer){_mediaPosTimer=setInterval(_updateProgressBars,1000);}
+  _updateProgressBars();
   const art=$('npArt'),cover=$('mpCover');
   if(d.cover){
     art.innerHTML='<img src="'+d.cover+'" style="width:64px;height:64px;border-radius:8px;object-fit:cover">';
@@ -159,7 +166,7 @@ function openPanel(id){document.querySelectorAll('.slide-panel').forEach(p=>p.cl
 function closeAllPanels(){document.querySelectorAll('.slide-panel').forEach(p=>p.classList.remove('open'));if(screenInterval){clearInterval(screenInterval);screenInterval=null;$('screenLiveToggle').innerHTML='<span class="material-symbols-rounded">play_arrow</span> Live';}if($('mediaPanel').classList.contains('open')){$('mediaPanel').classList.remove('open');}}
 
 function startMediaPolling(){if(!mediaInterval){mediaInterval=setInterval(()=>socket.emit('get_media_info'),3000);socket.emit('get_media_info');}}
-function stopMediaPolling(){if(mediaInterval){clearInterval(mediaInterval);mediaInterval=null;}}
+function stopMediaPolling(){if(mediaInterval){clearInterval(mediaInterval);mediaInterval=null;}if(_mediaPosTimer){clearInterval(_mediaPosTimer);_mediaPosTimer=null;}}
 
 function renderFileList(items){const grid=$('fileGrid');if(!items||items.length===0){grid.innerHTML='<p style="color:var(--text-sec);padding:20px">Dossier vide</p>';return;}grid.innerHTML=items.map(i=>`<div class="file-item" data-path="${escHtml(i.path)}" data-dir="${i.is_dir}"><span class="fi-icon ${i.is_dir?'dir':''} material-symbols-rounded">${i.is_dir?'folder':i.name.endsWith('.exe')?'terminal':i.name.endsWith('.jpg')||i.name.endsWith('.png')?'image':i.name.endsWith('.mp3')?'music_note':i.name.endsWith('.mp4')?'movie':i.name.endsWith('.pdf')?'picture_as_pdf':i.name.endsWith('.zip')?'folder_zip':'description'}</span><div class="fi-info"><div class="fi-name">${escHtml(i.name)}</div><div class="fi-size">${i.is_dir?'Dossier':_fs(i.size)}</div></div></div>`).join('');grid.querySelectorAll('.file-item').forEach(el=>{el.addEventListener('click',()=>{if(el.dataset.dir==='True'){fileHistory.push($('filePath').textContent);$('filePath').textContent=el.dataset.path;socket.emit('file_list',{path:el.dataset.path});}else{socket.emit('file_download',{path:el.dataset.path});showToast('Téléchargement...','info');}});});$('fileBackBtn').style.display=fileHistory.length?'inline-flex':'none';}
 function handleFileDownload(d){if(d.error){showToast('Erreur: '+d.error,'error');return;}try{const b64=d.data;const byteChars=atob(b64);const byteNums=new Array(byteChars.length);for(let i=0;i<byteChars.length;i++)byteNums[i]=byteChars.charCodeAt(i);const byteArr=new Uint8Array(byteNums);const blob=new Blob([byteArr]);const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=d.name||'fichier';document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);showToast('Téléchargé: '+d.name,'success');}catch(e){showToast('Erreur téléchargement','error');}}
