@@ -65,7 +65,7 @@ def launch_app(item):
     try:
         if typ == "url": import webbrowser; webbrowser.open(path); return {"success":True,"message":"URL ouverte"}
         if typ == "command":
-            subprocess.Popen(f'start "" "{path}"', shell=True, cwd=wd)
+            subprocess.Popen(path, shell=True, cwd=wd)
             return {"success":True,"message":"Commande exécutée"}
         if platform.system() == "Windows":
             resolved = path
@@ -371,6 +371,54 @@ def extract_icon_b64(path):
             for icon in small: win32gui.DestroyIcon(icon)
         except: pass
 
+def fetch_favicon_b64(url):
+    """Fetch a website's favicon and return it as a base64 data URL PNG"""
+    try:
+        domain = urllib.parse.urlparse(url if "://" in url else "http://" + url).netloc
+        if not domain: return None
+        fav_url = f"https://www.google.com/s2/favicons?domain={domain}&sz=64"
+        req = urllib.request.Request(fav_url, headers={"User-Agent": "Mozilla/5.0"})
+        with urllib.request.urlopen(req, timeout=5) as resp:
+            data = resp.read()
+        if not data: return None
+        b64 = base64.b64encode(data).decode()
+        return f"data:image/png;base64,{b64}"
+    except Exception:
+        return None
+
+def _resolve_shortcut_target(path):
+    """If path is a .lnk shortcut, resolve it to the real target it points to."""
+    if not path.lower().endswith(".lnk"): return path
+    try:
+        import win32com.client
+        shell = win32com.client.Dispatch("WScript.Shell")
+        target = shell.CreateShortCut(path).Targetpath
+        return target if target and os.path.isfile(target) else path
+    except Exception:
+        return path
+
+def enrich_icon(item, force=False):
+    """Fill in icon_b64 for a button/action if missing: favicon for URLs, extracted icon for exe paths"""
+    if item.get("icon_b64") and not force: return item
+    typ = item.get("type", "app")
+    path = (item.get("path") or "").strip().strip('"').strip("'")
+    if not path: return item
+    try:
+        if typ == "url":
+            icon = fetch_favicon_b64(path)
+        else:
+            resolved = _resolve_shortcut_target(path)
+            icon = extract_icon_b64(resolved) if os.path.isfile(resolved) else None
+        if icon: item["icon_b64"] = icon
+    except Exception:
+        pass
+    return item
+
+def enrich_config_icons(cfg, force=False):
+    for b in cfg.get("buttons", []) or []: enrich_icon(b, force=force)
+    for a in cfg.get("quick_actions", []) or []: enrich_icon(a, force=force)
+    return cfg
+
 def detect_installed_apps():
     """Scan Start Menu for installed apps (fast: only Start Menu + PATH)"""
     found = {}
@@ -617,6 +665,7 @@ def handle_update_config(data):
     if "setup_done" in data and data["setup_done"]:
         load_config(); config.setdefault("setup",{}); config["setup"]["done"] = True; save_config(config)
     else:
+        enrich_config_icons(data)
         save_config(data)
     socketio.emit("config", config); emit("config_updated", {"success":True})
 
@@ -667,13 +716,22 @@ def handle_update_theme(data): load_config(); config["theme"]=data; save_config(
 @socketio.on("update_logo")
 def handle_update_logo(data): load_config(); config["logo"]=data; save_config(config); socketio.emit("config", config)
 @socketio.on("add_button")
-def handle_add_button(data): load_config(); config["buttons"].append(data); save_config(config); socketio.emit("config", config)
+def handle_add_button(data): load_config(); config["buttons"].append(enrich_icon(data)); save_config(config); socketio.emit("config", config)
+
+@socketio.on("refresh_icons")
+def handle_refresh_icons():
+    """Force re-extract/re-fetch icons for every app button and quick action already in the menu."""
+    load_config()
+    enrich_config_icons(config, force=True)
+    save_config(config)
+    socketio.emit("config", config)
+    emit("icons_refreshed", {"success": True, "count": len(config.get("buttons", [])) + len(config.get("quick_actions", []))})
 
 @socketio.on("update_button")
 def handle_update_button(data):
     load_config(); idx = data.get("index")
     if 0 <= idx < len(config["buttons"]):
-        config["buttons"][idx] = data.get("button"); save_config(config); socketio.emit("config", config); emit("config_updated",{"success":True})
+        config["buttons"][idx] = enrich_icon(data.get("button")); save_config(config); socketio.emit("config", config); emit("config_updated",{"success":True})
 
 @socketio.on("remove_button")
 def handle_remove_button(data):
@@ -809,32 +867,65 @@ def handle_run_powershell(data):
     emit("powershell_result",{"stdout":out[:5000],"stderr":err[:2000],"returncode":rc})
 
 # System commands
+COMMAND_MAP = {
+    "lock": ("user32", "LockWorkStation", None),
+    "sleep": ("powrprof", "SetSuspendState", (0,1,0)),
+    "shutdown": None,  # handled via subprocess
+    "restart": None,   # handled via subprocess
+    "empty_recycle": None,
+}
+
+@app.route("/api/syscmd/<cmd>")
+def api_syscmd(cmd):
+    r = _exec_syscmd(cmd)
+    return jsonify(r)
+
 @socketio.on("system_command")
 def handle_system_command(data):
     cmd = data.get("command","")
-    cmds = {
-        "lock": lambda: run_ps("rundll32.exe user32.dll,LockWorkStation"),
-        "sleep": lambda: run_ps("rundll32.exe powrprof.dll,SetSuspendState 0,1,0"),
-        "shutdown": lambda: run_ps("shutdown /s /t 10"),
-        "restart": lambda: run_ps("shutdown /r /t 10"),
-        "empty_recycle": lambda: run_ps("(New-Object -ComObject Shell.Application).NameSpace(0x0a).Items() | %{ $_.InvokeVerb('delete') }"),
-        "admin_check": lambda: (True, {"admin":_is_admin}),
-    }
-    fn = cmds.get(cmd)
-    if fn:
-        result = fn()
-        if result is True:
-            emit("system_command_result", {"command": cmd, "success": True})
-        elif isinstance(result, tuple):
-            out, err, rc = result
-            if err and rc != 0:
-                emit("system_command_result", {"command": cmd, "success": False, "error": err[:200]})
-            else:
-                emit("system_command_result", {"command": cmd, "success": True})
-        else:
-            emit("system_command_result", {"command": cmd, "success": True})
-    else:
-        emit("system_command_result", {"command": cmd, "error": "Commande inconnue"})
+    result = _exec_syscmd(cmd)
+    emit("system_command_result", {"command": cmd, **result})
+
+SYSTEM32 = os.path.join(os.environ.get("WINDIR", r"C:\Windows"), "System32")
+SHUTDOWN_EXE = os.path.join(SYSTEM32, "shutdown.exe")
+
+def _exec_syscmd(cmd):
+    try:
+        if cmd in COMMAND_MAP:
+            entry = COMMAND_MAP[cmd]
+            if entry is not None:
+                dll, func, args = entry
+                if dll == "user32":
+                    ctypes.windll.user32.LockWorkStation.restype = ctypes.c_int
+                    ok = ctypes.windll.user32.LockWorkStation()
+                    if not ok:
+                        err = ctypes.windll.kernel32.GetLastError()
+                        return {"success": False, "error": f"LockWorkStation a échoué (code {err})"}
+                    return {"success": True}
+                elif dll == "powrprof":
+                    ctypes.windll.powrprof.SetSuspendState.argtypes = [ctypes.c_int, ctypes.c_int, ctypes.c_int]
+                    ctypes.windll.powrprof.SetSuspendState.restype = ctypes.c_int
+                    ok = ctypes.windll.powrprof.SetSuspendState(*args)
+                    if not ok:
+                        err = ctypes.windll.kernel32.GetLastError()
+                        return {"success": False, "error": f"SetSuspendState a échoué (code {err}) - vérifie l'option 'Veille hybride' ou la stratégie d'énergie"}
+                    return {"success": True}
+        if cmd == "shutdown":
+            subprocess.run([SHUTDOWN_EXE, "/s", "/f", "/t", "5"], timeout=10, check=True)
+            return {"success": True}
+        if cmd == "restart":
+            subprocess.run([SHUTDOWN_EXE, "/r", "/f", "/t", "5"], timeout=10, check=True)
+            return {"success": True}
+        if cmd == "empty_recycle":
+            subprocess.run(["powershell", "-NoProfile", "-Command",
+                "(New-Object -ComObject Shell.Application).NameSpace(0x0a).Items() | %{ $_.InvokeVerb('delete') }"],
+                timeout=15, check=True)
+            return {"success": True}
+        if cmd == "admin_check":
+            return {"success": True, "admin": _is_admin}
+        return {"success": False, "error": "Commande inconnue"}
+    except Exception as e:
+        return {"success": False, "error": str(e)[:200]}
 
 # Mouse control
 @socketio.on("mouse_click")

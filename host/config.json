@@ -57,22 +57,12 @@
       "name": "Deezer",
       "icon": "music_note",
       "type": "app",
-      "path": "C:\\Program Files\\Deezer\\Deezer.exe",
+      "path": "\"C:\\Users\\Utilisateur\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Deezer.lnk\"",
       "args": [],
       "color": "#ff0050",
       "category": "multimedia",
-      "favorite": true
-    },
-    {
-      "id": "spotify",
-      "name": "Spotify",
-      "icon": "audiotrack",
-      "type": "app",
-      "path": "spotify",
-      "args": [],
-      "color": "#1db954",
-      "category": "multimedia",
-      "favorite": true
+      "favorite": true,
+      "icon_b64": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAACE0lEQVR4nI1STWgTURD+3k+yidlNaqM0iBDqQTF6qTcP2p7Em1SvgnjoRcFLjyKK0mO99SoIXqWFHlo8iXgUD/7Si7FQIVbt36bdJLv7nsxss0mJirM8mP3mm3nfvBlR8soWfWaR/AoI/A8ue66AhUEr9hGaAMbGaYR8wihGHOIOFLAwaEabuDB8EycLFxGYbb6VPvIJoxhxkiKJ6a68nXADk5V7uFp5iM/NlxgrXcHTtVtMunF8DsecGk67EyjqEcw3HqGYGeZ2NCVHto2aN47x8hQ8DdTcCVTz5/B64wkXOD90HQVVhKvBnJXdV/gavIEWDoTnlmzHBrhdfY6z3iU4Mst9+XETu9EvLlDQZXjKZeFt08EH/wXmVq8hK/LEJSECa633CE2Lk0NrkZcuKk6VD/mEccy0mJtMQ0BKoVjKQuM+/GgdOUVvkpzQJqf7TzHiEJdyKFfyKIRCaEO885fQMUBWHpw1GWEUIw5xKScdo4DkR3r27Q7qe5/4OnrcROT+EllwjDjEpZx0jGRKZCCFwOL6DE9gsjLNN5LlpMB8YxarwVvmELdron+V6WG2wp8YcUYxfWIZR7OjjP/o1PH4y2U02nUMZY6kaz1QAPsbGdsIEgozpz4ydnflDKFQQqfSu5a20FMhmehHm1j4/oCxZrwFTx8eSP6jgv529uJt9g+p0gHZ/1TQa8Uip7zU/5v9BjAX3iGR61S0AAAAAElFTkSuQmCC"
     },
     {
       "id": "youtube",
@@ -83,31 +73,22 @@
       "args": [],
       "color": "#ff0000",
       "category": "multimedia",
-      "favorite": false
-    },
-    {
-      "id": "chrome",
-      "name": "Chrome",
-      "icon": "language",
-      "type": "app",
-      "path": "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
-      "args": [],
-      "color": "#4285f4",
-      "category": "multimedia",
-      "favorite": true
+      "favorite": false,
+      "icon_b64": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAATlBMVEVHcEz/ADP/ADP/ADP/ADP/ADP/ADP/ADP/ADP/ADP/ADP/ADP/ADP/ADP/ADP/ADP/////EUb/ACL/RGP/7/P/q7n/hpn/zNX/3eP/Z34pvHLoAAAAD3RSTlMA6zaWxYZkrPTcSyF7D/rE87ViAAABdklEQVRYhe2W226DMAyGnaMJhCTtKLTv/6ILXYXQWicZvtkFv4SEhPwp+JQf4NSpf6VhkL21RiFq7ZwQIoS4KQQhnHNaIypjbS+H4Ve4Ryd2AbTC8wnCod+Fm5bQdxlm/EY4HP8ijMfjY2QeIMY1k5oRH3Suv+OcwA0gm8pPSUjoOfEx9mB5AEsX4dIEMKBIwPJ1rQMUIAlI6VZHIN0GGZCm+VpBaCDbYAVkxKMMcDVASkssHcKBqAFyKi40QkBXB6Q7nYoOSPYOkBEPitAIWP+DCUjL5zO0AshyAjnNewDdUKGpCoWW7hr6oDhUotqJ01zpxOIwpelWmSZdBtRXgi7tg3vDRsHCRpoLM7RJgSe/NYSvVxNvKwcLkgWIEiTZii3KN9PIuhv1yLudcxWBdzn2q8NgJKF7eqTjaezkj8s6/BP95lLxgMsIuHer0qImV8u7hEYrPxnmMRvm7Ji9N0apbJtfyu/KGO+zS842efy7ET91qqZvZj+d0TOLUpwAAAAASUVORK5CYII="
     },
     {
       "id": "vscode",
       "name": "VS Code",
       "icon": "terminal",
       "type": "app",
-      "path": "code",
+      "path": "\"C:\\Users\\Utilisateur\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Visual Studio Code.lnk\"",
       "args": [
         "."
       ],
       "color": "#007acc",
       "category": "dev",
-      "favorite": true
+      "favorite": true,
+      "icon_b64": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAACEUlEQVR4nGNgIBLwWQTmSy+69U1p1as/Ykm9S2HijMRoFggqX/hB2y0OxFYzMweL/fn27e/H1ROmEDSAJ6Ru7Rd1uyAYX80cYgAMsODSyMTJK8zlVTDzi5ptEMP//3Dx///Q1HEn9K1mmHjtP1vl5uusInKqMM0ssX1HvqjaBDP8+8cAw0w/vn5hAJmFhBkZ+q/CjWf68fUz+7r2or8GXsW/BGU1kG1if3H9JOvWjlCJWXceIYszclqGZX4PqZuG4q6vnxgYPn+AczlPr+7+fmB+GRcXF5fUohdfUQxgYGBgYJXVMfuTMW//fzZOLrjM7x8MjC8ff2Hd1BLy6/65nWCDODk5pRa+/IYSBgwgr/z++f//6+f/Gf6C/PofgpnZGRiEpRgYWNjhXvz///9/BlAgImEmNj339D8RvacYGBi5Gd68YGD4/Qcu+Z+Vi+dX0sydbO557TADQBGCjJl+OWTNgNv6+d0n1uVliczPb1+Fi/37z/DLLrmCJW3BEQYOXgFkcRBmZHEvXPpHzT6K+e2DK/+3dgT8+/jiLgMHryBzyvxDf8VVdFAC9+eXT4oaunwYgciADYAM8a6Y/FffKxpZWFFBCUUZzpTI8OPz+79rq2OY/v37/0/fOwYRkKjKwLGAD/xbXxvLdGL5ZETIQ/z+5/uPP6/XtHcS0g8HjPq+icLdNz9LT3vxmyeiey5MAgBUqO/kUHuQAgAAAABJRU5ErkJggg=="
     },
     {
       "id": "github",
@@ -118,25 +99,27 @@
       "args": [],
       "color": "#6e40c9",
       "category": "dev",
-      "favorite": false
+      "favorite": false,
+      "icon_b64": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAb1BMVEX///8kKS74+PgsMTY+Q0f8/Pzw8PGRk5ZNUVXr6+xDSEzCxMUpLjLV1tYuMzc/Q0i3ubuUl5lbX2NTV1uLjpFKTlKxs7Xh4uOFh4rn5+h3en1vcnZ9gIPc3d6/wcJzd3o3PECmqKpjZ2rOz9CfoaRP5W5KAAABU0lEQVQ4jW1T7aKCIAzdEEUTSUuzLMtuvf8zXtiQVDx/lJ3DvgEIEPU9l1rL/F4LiFEMCQYkj2JDC6VxhaRJl3x2xgin7MePMuYRD7cQftrjrcL7ELk9nNt8yXXtyRm5mquzXADKA6LpzgZRlgBPZ1WO7yn/yrmqyGdGn95Zjav2hbNghZHMV3uNG3DZCigEmhRq+pmyrUAcifj4CO+49xciWqAe6p3pCJrNH1ATp5gH6KghQLrDnoB8GxaYPYFkhpONipjrl+wI61hQ8tB5EvYb4eTL5Ebhd8u/2f4EYfhvvWJpw9ZJ0LQfb5uxbMKi3pp5xVp30miexZHbRriHvUnojrKt7isXqWRBFQQNF2w3aYCPUl8/EREWzxtuE+pVI/wbkSGp0a51Nyg1F+L5/nel56xXgt+zcMgeC0FK27gdTzVoPXtI9DBuO2tRhJj94m3/A1GiDZXoM3d5AAAAAElFTkSuQmCC"
     },
     {
       "id": "steam",
       "name": "Steam",
       "icon": "sports_esports",
       "type": "app",
-      "path": "steam",
+      "path": "\"C:\\Users\\Utilisateur\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Steam\\Steam.lnk\"",
       "args": [],
       "color": "#1b2838",
       "category": "games",
-      "favorite": true
+      "favorite": true,
+      "icon_b64": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAACuElEQVR4nH1TbUhTYRR+7t2u2911ZtOsOY1ZtiQnodYqwb5MJEko6YeMgsBBjiAE/VE/FfqgPwZJImlE2QxSwpLARko2KZfLAispkw23OZ0fs/yYbrs37i1tU/HAAy/nPc9zzoHzEFgVIorWSWQKAyVl8kmCUvE5lgu4Av458+L8VEMosGANryf+P8kYJlZVJ2Xi9Ngg/HOTpjmfywiwvwQWBBkyZlN8mpmOVuoJIgrhyM7MxKv2Jkw4+zH4qROVFZX62IQ0M89ZEZBvTq2T0AodSUQhHEmqJLQ21+J1Vy9yjuphvFyNivJSXDJe1PEcobeYkuvilft71xu3tuYq/Et+iEUipO/ZBa93GvWNLai5VYmsgyWYGP1wgKTlyYbVYy9Do1HD9vEHaJqBNj0VabtT4PH4oFRuEf55rlgarcoHJV3TvehkDjK0qcjNzcarLhs4goREQiEzSwvHyBh4Ds8lTxUXJEPGICSlVxCr3IobVWWC0Jmiwziep4PpuQXDTi9uVpfh9r02oQ5MrIrgOI4bGZ3E/ZYuPG57C82ORJRfKMSJnIyIiQLBEIYcHtxt6kBze4+Q49hgQBBYLmJZDq7xaTw196E4LwvqxHgh3/fFDkPVAzhGJyNEQwszdrLD0udcCob+nhJJIMhyyMnSoLbVgtn5Rdxp6UZBZT2Gp+cj1uSxNDtmJguLTp8tuf4E7wdHBJGUxDjsS9sOPylCY4cNVx52wk9JEKJla7DkGWgQsz5X74uX7Sab06fvvnYOlm9OOMZnIGVk6BkaA0vL1j3poKPfxM24rcIlBm3PjG633Vra2IkEhRy5GWqIaRptX91gZcwaBOe8Vp4TaSZKGkMeOV9Hag5taCb2+zsT++aREQG/YKYwN/6LbTt10B4zEOq9+ZArBDvj95SLs382Y6CrAZ6fEXb+A9AkEm2gMhFFAAAAAElFTkSuQmCC"
     },
     {
       "id": "discord",
       "name": "Discord",
       "icon": "forum",
       "type": "app",
-      "path": "discord",
+      "path": "\"C:\\Users\\Utilisateur\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Discord Inc\\Discord.lnk\"",
       "args": [],
       "color": "#5865f2",
       "category": "games",
@@ -158,11 +141,12 @@
       "name": "Terminal",
       "icon": "terminal",
       "type": "app",
-      "path": "cmd",
+      "path": "\"C:\\Users\\Utilisateur\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\System Tools\\Command Prompt.lnk\"",
       "args": [],
       "color": "#4d4d4d",
       "category": "system",
-      "favorite": false
+      "favorite": false,
+      "icon_b64": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAjElEQVR4nGNgGGjA2D9p+n9KDGABES7ungQVTl2wkSE7wR+FVpdkg7jA2sqMLNuPHjsFcYGZiTFZBvRPms7AxEAhYELm/P//H4zRATYxDAP+///PwMjICMYwDfg0YnUBDIAMQabxGcaETRDdBcgGoQMWZFvRNWDTiK6GBVkSn024DKU4GsEuACWIAQMANi02oab1GCcAAAAASUVORK5CYII="
     },
     {
       "id": "notepad",
@@ -185,6 +169,90 @@
       "color": "#1a9fff",
       "category": "system",
       "favorite": false
+    },
+    {
+      "id": "app_1785339708389",
+      "name": "NGENUITY",
+      "path": "\"C:\\Users\\Utilisateur\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\NGENUITY.lnk\"",
+      "icon": "apps",
+      "color": "#033768",
+      "type": "app",
+      "category": "",
+      "favorite": false,
+      "args": [],
+      "row": 0,
+      "col": 0,
+      "icon_b64": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAADfUlEQVR4nB1Tz08bZxB937fr9drYpmAiUWODUAoJUqhEW1eKRUCJRCyIUdUmmBYIUqsqCickeuBAm0saWvovNIceOOACOVSml4KBSiCkOBUNIcJCaUGBqI5/29heL7vfV3kPc5jRzNO892YIAPTR/uAHzZe/LTsyFzkty6JwTgSqErAiKEoQTAxM1JkuMsDEKvWm3Ku/jl4/WnrJFsgN8bOhK1faQ9GGTcJ0AkIosrk8FEWFLFsAUJQVBWaTGbUOB7jOAAjo86QRi734nNzzPDrca/vtPZQEHZwLqWQS129cx2AgAKfTCRAgkUhgZWUFkUgE9fV14ICuEotwu/3ff8SMPd2sVVQQTRJy+Sx++OlHuN1uzM/P4/T0FLqu41J7O+7dvw9/fz+mp6dht9UI57qCRMXaTEv8XOScIf42joffP4QkSZiYmEAsFsPW1hb29/cNsEAgAFmWMTs7i3g8DsYYzjkXqUoJzaTT8Pl86OzsRDAYRFdXF8LhMBobG0EphaO2FrJsxtjYKNra2tB3sw/JZAqEElCFcxQLBYzdvYvl5WVommYE59xY9+joCOPj41haWkYo9Cvsdjs+9nqhKAo45RDPdA1WiwXb29tYX48YwyaTyQDzeDzw+/1oamoyRKzWzGYz4v+9MRyp6BVQVdAgiSaEQiFYrVb09PSgo6PD4PjdgweYmZmBWTbj+PgYe3t7IIRgKBhEuVRChQKUmSlPJdOYnJzE48c/Y2rqG3i9XkO8jfV1/P38OYbuDKFcLhugAwMD6O3tRT6bQ1kAcPHDr1lTYx0fHPyE7+7uckmSeI3Nxl0uF3e73bylpYUXCgU+OjrKBUHgBwcH/Natfu6oucBvfuHmVKUat9lsWF1bw87ODv5YXYVFlpFKpXB2dmbcwlXfVTyNPjV02PxzE2uRCBx2O6r6kXd9XymW179LKpFJJpXA3Nwcuru7sbi4aHCu2tja2oqRkRFEo1FMTU2hzvkOWEngLr+iEYd/+mXDi186FC5oDBDeJhKk59o1DA8Po6WlufprODk5wUJoARvrG2i44ARhRKOqKDq+zMYI3g8EnG7XE8uzJyZd1aqnj3wujyJjkIyMQAWDlchwOGqhMR1UEGH+VNOyieTtagfw0cCA5dLlGVPpTTsok6nECSEKOC8CKIISBWAVQFc4pZpCXOph8TAzWwqfh/8HvXeeklIJyDQAAAAASUVORK5CYII="
+    },
+    {
+      "id": "app_1785339828711",
+      "name": "edge",
+      "path": "\"C:\\ProgramData\\Microsoft\\Windows\\Start Menu\\Programs\\Microsoft Edge.lnk\"",
+      "icon": "apps",
+      "color": "#1d9545",
+      "type": "app",
+      "category": "",
+      "favorite": false,
+      "args": [],
+      "row": 0,
+      "col": 0,
+      "icon_b64": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAADBUlEQVR4nF1TXWgUVxT+zr13ZnZ2o1lFUbGBotjS1mD6IFKJti+GiKAPbYkPQgqp4Lu0FF/EZwUppIi4SJEWiSgEkRJCUYi29Q+xCFGQGCObmLi7mXH2Z3Z27o/MbLeoBy73cjnn+z7O+Q7hvfjwh9FC/qvBr/kKN29EAEYalhWBq0oYPn5wd/rYyeFwoTzXyafOo2vrzv6PTl2dZBnhKqoDLIKiJhiTABSyTg22FSKXWTJL4xPn7//4+/dJHesUb/l5YgoOdxWa0JCQRqXASrcJpOKwxWtoY9Mnh3pHdp0eLPyvYNsflQbP2K6mCKAYya0QwlAMwMCxWnCsKnKZMrKOj1W5Ihzh4dr+sV2i5+iZAjm2W35WRL0UwDAHnBE4b8DdYMPdKBDFNggcgrIQ8BFgJdblS9jzy45f6bMri2p+eoYpngezbTDOwDiBC0obyHUZ3b0Z2GwZOaeE7mwRrhMgay0iY/lggReySHZBk4BWgFYmPcrzEE9dvBDOzEy1XoVw+AIsvAR0BNn0ANMC6RpE4EtosgBlYIyGAcEsLSD86/Lt5t+jw0mPej6+NEPrg02GScSxhmUDrUYVzAFY/XUL2lCbWRvoloR6+gjq1ZPLnRH7T6/dMCqGUgCXLwBVAyOFZtnzmdaASQqTO1FRmgeBIDb2HegAdH/Ruw+6ASOraEUGJCuQUWBuH39yhOlG4KfM/4FQPQCIga3e1C96tg8lAM+Oj367fOvRuC7PLupqyS/+WRy//t293XMTlTHC3hMF6vtmhBhARBCVOViLs4ksgDtGzt4833xwIXXd22Ft6BuKXz4ca1v56P0G2RmXkvnXPTjP/00NlCphAkbF0tTLc6axXOQr128jsrpIy9if+CmbWhljhweMNibphcqtgl6xuk2jJaBjEOOC59ZuFmu2fMmsbD75qN05O/DOMuGDz/sxdG4yUcKMhjP/GKxaAimZZrH22gCyGdb+OTOgvNlb7wJ0Yu+JAv908CDsbI6pCLzmgUcB7DBoNacnfwsfXhx5O/8NVrt4xFgcISIAAAAASUVORK5CYII="
+    },
+    {
+      "id": "app_1785339859573",
+      "name": "roblox",
+      "path": "\"C:\\Users\\Utilisateur\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Roblox\\Roblox Player.lnk\"",
+      "icon": "apps",
+      "color": "#1991ff",
+      "type": "app",
+      "category": "",
+      "favorite": false,
+      "args": [],
+      "row": 0,
+      "col": 0,
+      "icon_b64": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAACOUlEQVR4nGWTT08TURTFf/fNtNMBQmIwVQIiQqOAxkSFaHTXhYnCRve6YuE30A+iO76BCxcUlyQuNCZUFsqfamppApVoJDGk0D+0M+b2DQ7Fm7xk8ua9c88751xxvHR69N7CQv9QNgu+7zjGGANBAGHIfxUGQRBSq+1XlpfL7+fnZTy7uHg2MzfXaoAIHLWg1gAvAV4SFIwQgrAb0PVgr7i0JDeetFoSVfNIJHMBrmcgvwk7v+CwDo6xYEkXxEC7Hf4rVzBGLzsOHFbh/m149siyKFXgUwFWNmFjC37uQaMFflLES4oEbQUwSlzfZmnfvALtAFJJuDpm19OHsH9gQZTZch5KPyDhirh6WSGaLRgcgKlLlvJpAft74c41u/5UYa0EZ/pBJcII1Ju2W59vL6iYb97B+pb9pyIqs3oDPq5ZhuqU6ZwWFQZmpuKO3yvw4hU8fg5vP9gmyqy8a8VVUZWl0cOK1OvD9EQMUCjH35MX4+98AQ5qkb1qpwg0mjByHkYHLU3de3AXLo/At20YH44BVjZAHdNsdACMsW9UcVJefPCkC8eCVmuwXoreH+0Zpd+TgtUCvHxtBVLLTpcyUxt392ygjkFdDYP6WdyBLyXwXDgX2TkzCbcmYGwIfA9Wv0LjCPp6FFGzE4ZdUXYcEQ2UZkJ10a7KbjgN05PwuQjFbUgm4ihLJpvLDWRmZ3WYjktFVNvUXn2igmlnZZGI6Osw/S7mcnJynAXfl84wd1cHMBrxoN09zn8B4Z79fa1OBqEAAAAASUVORK5CYII="
+    },
+    {
+      "id": "app_1785339877285",
+      "name": "CAPCUT",
+      "path": "\"C:\\Users\\Utilisateur\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\CapCut\\CapCut.lnk\"",
+      "icon": "apps",
+      "color": "#000000",
+      "type": "app",
+      "category": "",
+      "favorite": false,
+      "args": [],
+      "row": 0,
+      "col": 0,
+      "icon_b64": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAB50lEQVR4nKVSPasaURAdd9ePp5WNVXA/IbGzsIyClXb+BCMEtLDXwkYEsQrBSotgRMHKUpJOxMZGxD67dzUvrU9QCeiuN8xFl2cM5IWc4p7LzM65M3MW4D/hul5EUVSz2ew7TdNUQRAEzHEcx3Ln8xmJWpZl6bpudLvdz6ZpfnNURFF8rev6mr4QhJDvkiS9cQSq1eoH+o+o1WofsVbAQ1VVDXm73UK73YbNZnM7p8sFsVgMUqkU6LoO0WgUFEXRHAGe593Ik8kEyuUy+4DneTidTuD1emG320Gz2YRQKATxeBx6vR5wHMdjDff8pUAgAH6/H8LhMLRaLZjP51CpVFgchTKZDNTr9XsrBoPBF5zLtm06m81oOp2mPp+PRiIR6na7aaFQoIZh3OwAa+46QFytw7nxjow2Xqy8A3dhisd4PIZkMsnanU6nsFwuYTgcwmKxYEssFouwWq1uBARWTVk97Pd7OBwOsF6vIZ/PsyV6PB4WOx6PMBqNmFP9fv9WwLZt1l8ikYBGo/FXGy+PUkeAEPIDORgMQqlU+uOsV6DFCMMwHp2gJElvCSFPL/0LTdPcKoqSYN1dRWRZTuVyufeyLL8SBOHOHYRlWWdCyGOn0/lECPl6I/DMlYcL/57DmXFXPy/M8AtyL1c4ctpXCAAAAABJRU5ErkJggg=="
+    },
+    {
+      "id": "app_1785339906525",
+      "name": "world",
+      "path": "\"C:\\ProgramData\\Microsoft\\Windows\\Start Menu\\Programs\\Word.lnk\"",
+      "icon": "apps",
+      "color": "#1991ff",
+      "type": "app",
+      "category": "",
+      "favorite": false,
+      "args": [],
+      "row": 0,
+      "col": 0,
+      "icon_b64": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAC0UlEQVR4nF2Tz2tcVRTHP+e8d2cmzowJJI0/ajHY0lh/lEpTQUWq4sIfi3TZhSL+B90IXbhoBLtxIxVBBMlCQUEx4s6VC8WVG8faaE2Km2qxSZqZybzf7x25bzIWPXC555x7vt9zzzn3Cvsyc3Bh4cl3VleTx06fTisR7zPMOqXIfAYHMpjPzA7k1PbaxysXVj9bWakDvbz60dra1LNnzmymEJVmKmOSZrUPLmAu9brV9mwOzy2r6ITg+IvLy5OsE7CXTMwSNcsEcoVMIQkgDsbn4SQQEakwE26DJ/5CIRVIPFiFRI1I/0dgNgab/QeONz049eB9klhB8mpMcPfSK68dfuniu1++vy3ZKCaLU6zMgIrGbIPwoVnothmW4HIhKDxY2LmejwnufeqNC2ncnEmjiDxOyP2eJFiZozeF5vU+nRNH0dJzCmWhFCXMlOMa1GRu4YVHAlbOTrN02LHx6QkeX5ziw/MP8vKpNv0/t4hCIXZK5AKGThg6pe/GrdJkL+LyxoBTi1MsHnS189j9Uxyab/HTlS3i/pBYhUiFvQAiJwxCYTAOJUz3Rta7Wsmd7UM8vzTND71dnnh0mvvuatFb3yJP0rp5Koa/dD0jTxT5PkGYxyOx0uyXzT15+IEOb753hUvnj/Pdj39T5jlVkTHo3WBUYQNR8WNrVMLNazv1vDSLYsviiJ9/7/tR8snXm/SHOb31bYospcwL0ss7ROu70v91l+3fBtzYGFBWYd0EmXv6i1tWuZmqqqiKos5aZ84zijRFWx30npNIEOAfrqHm61AVGX1zRHR49YNz2eivP4okJk9iijQZryxFGy3CuSPmWnfgmm1cq0Njqkur3RXX7NYl3H62xy59K9Mnn9GggYYODRoWhg3RMPQ6oqGFzologCBUhm193tV/PxPX3n7dbn3/laqiGhAEgai/duAIQkfYaIrXzaQuIV6/+JbH/QN8aUioNQzKTgAAAABJRU5ErkJggg=="
+    },
+    {
+      "id": "app_1785341091842",
+      "name": "bureau a distance ",
+      "path": "\"C:\\ProgramData\\Microsoft\\Windows\\Start Menu\\Programs\\Accessories\\Remote Desktop Connection.lnk\"",
+      "icon": "apps",
+      "color": "#1991ff",
+      "type": "app",
+      "category": "",
+      "favorite": false,
+      "args": [],
+      "row": 0,
+      "col": 0,
+      "icon_b64": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAC/klEQVR4nH2TX2gcVRTGf3N3dma2yTbWNG5N2WI2JexTFpomWIXGqg8KRnBDnxpYaxuJLBE0FATrS18KBUGwhoB/kgclYCwoFkSIBF+jLk0M2c2f1kqkHbPbZJN01v0zM1dm2qykD34v93DOPd853O+7yvlzr7/37jtvX6YOiZQPI+ngh1J6WaRXkJLPPv9y9OOro2mvpCwuZOQvv83X24WiIAICIQSGoSNEADUgCKgPzpaDTdw1N3jp5T7Fu6/uNqZSYdgfgcAToB4iPRKm/xUobIPlQsWGjU2bF5pncRy3PlCtT36shqta0FSCUpHCXxqxx3VaG0ENgqbBnXUBFYnj7iGQCKHQFoU1c5tqOQRKkMyiwcLKQUIhhZoEQ4N8UXK0SeLYzn8EEgVFUWh9UuVe0aJ6Pw+6zd93qmSXNKKtOqWqIKQHyRftBwR7NpAumqZRrlRoCrtsWyVcJ0hlR5Bb2eSfYo783Tk2Cyu4UnJvuZUDB5p9ATx9VC8KCIFp7iBUBaHYuG6QWhVajJ/Yr93nxdMnicff9CfmcjlmZ2cZGhqaGRsbO6VK6fqyrS3lQQtC1QaKdMRrHGrex7m33qBRC+86hIa2ILGGw54neru7u0dUzyhH26P8fiOKVB6aBck3167T0/McfxZv0tIQoWVfhDkzw6uTJ0jGz/DasbNMT0/3iU9GP728tW2xsbVDobDF+nrRN8rt22vE43EmF77g+YlOzB2T/q97ORw+wvvPXCHWFkPX9U4eRSKR6EmlUpcGBgZkoVCQtVpNHh87Is9/2y8ty5LtHzXI9Hdn5K0/bslkMrlZN5KHdDp9aXh4+APHtpicvEY2m+V66SvyJZOLz17Btm1+OP0rujDI3shRLpfnfT/vYmbmR//vlMsVsotLSEVwMvk0eiBEtPEpX3/HdnFdh4mJCaampi7sIXgEyuDg4ExHR0dvItFJLNaO4zisrq4yPz/H8vLKz+Pj46f+j8An6erqGolEIn2GYfgP5q1tmub3mUzmQ0+ufwFqDVDRcGJm0wAAAABJRU5ErkJggg=="
     }
   ],
   "quick_actions": [
