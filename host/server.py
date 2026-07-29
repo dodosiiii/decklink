@@ -126,8 +126,17 @@ def get_temperatures():
         try:
             import wmi
             for z in wmi.WMI(namespace="root\\wmi").MSAcpi_ThermalZoneTemperature():
-                try: t[z.InstanceName or "CPU"] = round((z.CurrentTemperature/10.0)-273.15,1)
+                try:
+                    temp = round((z.CurrentTemperature/10.0)-273.15,1)
+                    name = z.InstanceName or "CPU"
+                    t[name] = max(t.get(name, 0), temp)  # keep highest per zone
                 except: pass
+            # Try the perf counter class (returns Celsius directly in tenths)
+            try:
+                for tz in wmi.WMI(namespace="root\\cimv2").Win32_PerfFormattedData_Counters_ThermalZoneInformation():
+                    temp = round(getattr(tz, "Temperature", 0) / 10.0, 1)
+                    if temp > 0: t[tz.Name or "CPU"] = temp
+            except: pass
         except: pass
     if not t:  # fallback: try via powershell
         out, err, _ = run_ps("Get-CimInstance -Namespace 'root/wmi' -ClassName MSAcpi_ThermalZoneTemperature | Select InstanceName,CurrentTemperature | ConvertTo-Json -Compress")
@@ -812,8 +821,20 @@ def handle_system_command(data):
         "admin_check": lambda: (True, {"admin":_is_admin}),
     }
     fn = cmds.get(cmd)
-    if fn: result = fn(); emit("system_command_result",{"command":cmd, **({"success":True} if result is True else (result[1] if isinstance(result, tuple) else result) if result else {"success":True})})
-    else: emit("system_command_result",{"command":cmd,"error":"Commande inconnue"})
+    if fn:
+        result = fn()
+        if result is True:
+            emit("system_command_result", {"command": cmd, "success": True})
+        elif isinstance(result, tuple):
+            out, err, rc = result
+            if err and rc != 0:
+                emit("system_command_result", {"command": cmd, "success": False, "error": err[:200]})
+            else:
+                emit("system_command_result", {"command": cmd, "success": True})
+        else:
+            emit("system_command_result", {"command": cmd, "success": True})
+    else:
+        emit("system_command_result", {"command": cmd, "error": "Commande inconnue"})
 
 # Mouse control
 @socketio.on("mouse_click")

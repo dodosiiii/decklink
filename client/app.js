@@ -152,7 +152,7 @@ function updateStats(info){
   $('statDisk').textContent=disk.toFixed(1)+'%';const diskBar=$('statDiskBar');diskBar.style.width=disk+'%';diskBar.className='stat-fill'+(disk>90?' critical':disk>75?' high':'');
   $('statHostname').textContent=info.hostname||'-';$('statIp').textContent=info.ip||'-';
   if(info.boot_time){const up=Math.floor((Date.now()/1000-info.boot_time)/60);$('statUptime').textContent=up>1440?(up/1440).toFixed(1)+'j':up>60?Math.floor(up/60)+'h '+up%60+'m':up+'min';}
-  const tv=Object.values(info.temperatures||{}).filter(v=>v>0);$('statTemp').textContent=tv.length?tv[0]+'°C':(info.admin?'- (aucune)':'- (admin requis)');
+  const tv=Object.values(info.temperatures||{}).filter(v=>v>0);$('statTemp').textContent=tv.length?Math.max(...tv).toFixed(1)+'°C':(info.admin?'- (aucune)':'- (admin requis)');
   if(info.gpu&&info.gpu.util>0){const g=info.gpu;$('statGpuUtil').textContent=g.util+'%';const gBar=$('statGpuBar');gBar.style.width=(g.util||0)+'%';gBar.className='stat-fill'+((g.util||0)>80?' critical':(g.util||0)>60?' high':'');$('statGpuInfo').textContent=g.name||'GPU';const pct=g.memory_total>0?((g.memory_used/g.memory_total)*100).toFixed(0):0;$('statGpuMem').textContent=pct+'%';const gmBar=$('statGpuMemBar');gmBar.style.width=pct+'%';gmBar.className='stat-fill'+(pct>80?' critical':pct>60?' high':'');$('statGpuTemp').textContent='Temp: '+(g.temp?g.temp+'°C':'-');$('gpuCard').style.display='flex';$('gpuMemCard').style.display='flex';}else{$('gpuCard').style.display='none';$('gpuMemCard').style.display='none';}
   if($('statsPanel').classList.contains('open'))socket.emit('get_processes');
 }
